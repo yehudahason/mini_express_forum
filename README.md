@@ -1,4 +1,4 @@
-### Mini Fourm with Express.js and POSTGRES
+### Mini Forum with Express and POSTGRES
 
 - Setup Postgres database
 - Set .env config file like env.example
