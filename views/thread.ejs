@@ -1,0 +1,40 @@
+<a href="/" class="back-link"> ← Back to threads </a>
+
+<article class="thread">
+  <h2><%= thread.title %></h2>
+
+  <div class="meta">
+    Posted by <strong><%= thread.author || "Anonymous" %></strong>
+    on <%= new Date(thread.created_at).toLocaleString() %>
+  </div>
+
+  <p class="thread-content"><%= thread.content %></p>
+</article>
+
+<section class="replies">
+  <h3>Replies</h3>
+
+  <% if (replies.length === 0) { %>
+  <p class="empty">No replies yet. Start the discussion!</p>
+  <% } else { %>
+  <ul class="reply-list">
+    <% replies.forEach(r => { %>
+    <li class="reply">
+      <strong><%= r.author || "Anonymous" %></strong>
+      <div><%= r.content %></div>
+    </li>
+    <% }) %>
+  </ul>
+  <% } %>
+</section>
+
+<section class="new-reply">
+  <h3>Add a Reply</h3>
+
+  <form method="POST" action="/thread/<%= thread.id %>/replies">
+    <input type="text" name="author" placeholder="Your name (optional)" />
+    <textarea name="content" placeholder="Your reply..." required></textarea>
+
+    <button>Reply</button>
+  </form>
+</section>
