@@ -1,4 +1,4 @@
-<h2 class="page-title">Latest Threads</h2>
+<h2 class="page-title">שרשורים חדשים</h2>
 
 <section class="threads">
   <% if (threads.length === 0) { %>
@@ -22,14 +22,14 @@
   <h2>Create New Thread</h2>
 
   <form method="POST" action="/threads">
-    <input type="text" name="title" placeholder="Thread title" required />
-    <input type="text" name="author" placeholder="Your name (optional)" />
+    <input type="text" name="title" placeholder="כותרת" required />
+    <input type="text" name="author" placeholder="שם" />
     <textarea
       name="content"
       placeholder="Write your message..."
       required
     ></textarea>
 
-    <button>Create Thread</button>
+    <button class="btn">Create Thread</button>
   </form>
 </section>

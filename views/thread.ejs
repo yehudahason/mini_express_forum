@@ -1,21 +1,19 @@
-<a href="/" class="back-link"> ← Back to threads </a>
+<a href="/" class="back-link"> ← חזרה לדף הבית </a>
 
 <article class="thread">
   <h2><%= thread.title %></h2>
-
+  <p class="thread-content"><%= thread.content %></p>
   <div class="meta">
     Posted by <strong><%= thread.author || "Anonymous" %></strong>
     on <%= new Date(thread.created_at).toLocaleString() %>
   </div>
-
-  <p class="thread-content"><%= thread.content %></p>
 </article>
 
 <section class="replies">
-  <h3>Replies</h3>
+  <h3>תגובות</h3>
 
   <% if (replies.length === 0) { %>
-  <p class="empty">No replies yet. Start the discussion!</p>
+  <p class="empty">ללא תגובות</p>
   <% } else { %>
   <ul class="reply-list">
     <% replies.forEach(r => { %>
@@ -29,11 +27,11 @@
 </section>
 
 <section class="new-reply">
-  <h3>Add a Reply</h3>
+  <h3>הוסף תגובה</h3>
 
   <form method="POST" action="/thread/<%= thread.id %>/replies">
-    <input type="text" name="author" placeholder="Your name (optional)" />
-    <textarea name="content" placeholder="Your reply..." required></textarea>
+    <input type="text" name="author" placeholder="שם" />
+    <textarea name="content" placeholder="תגובה" required></textarea>
 
     <button>Reply</button>
   </form>
