@@ -1,5 +1,19 @@
-<h2 class="page-title">הודעות חדשות</h2>
+<section class="new-thread">
+  <h2>נושא חדש</h2>
 
+  <form method="POST" action="/forum/threads">
+    <input type="text" name="title" placeholder="כותרת" required />
+    <input type="text" name="author" placeholder="שם" />
+    <textarea
+      name="content"
+      placeholder="Write your message..."
+      required
+    ></textarea>
+
+    <button class="btn">הוסף דיון</button>
+  </form>
+</section>
+<h2 class="page-title">הודעות חדשות</h2>
 <section class="threads">
   <% if (threads.length === 0) { %>
   <p class="empty">אין שירשורים פתח חדש</p>
@@ -18,20 +32,4 @@
     <% }) %>
   </ul>
   <% } %>
-</section>
-
-<section class="new-thread">
-  <h2>נושא חדש</h2>
-
-  <form method="POST" action="/forum/threads">
-    <input type="text" name="title" placeholder="כותרת" required />
-    <input type="text" name="author" placeholder="שם" />
-    <textarea
-      name="content"
-      placeholder="Write your message..."
-      required
-    ></textarea>
-
-    <button class="btn">הוסף דיון</button>
-  </form>
 </section>

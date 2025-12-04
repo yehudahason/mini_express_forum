@@ -102,6 +102,32 @@ forum.post("/thread/:id/replies", async (req, res) => {
   res.redirect(`/forum/thread/${id}`);
 });
 
+forum.post("/thread/:id/delete", async (req, res) => {
+  const id = Number(req.params.id);
+
+  // Delete replies first (FK cleanup)
+  await pool.query(`DELETE FROM replies WHERE thread_id = $1`, [id]);
+
+  // Delete thread
+  await pool.query(`DELETE FROM threads WHERE id = $1`, [id]);
+
+  res.redirect("/forum");
+});
+
+forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
+  const threadId = Number(req.params.threadId);
+  const replyId = Number(req.params.replyId);
+
+  await pool.query(
+    `
+      DELETE FROM replies
+      WHERE id = $1 AND thread_id = $2
+    `,
+    [replyId, threadId]
+  );
+
+  res.redirect(`/forum/thread/${threadId}`);
+});
 /* ---- MOUNT ROUTER ---- */
 app.use("/forum", forum);
 
