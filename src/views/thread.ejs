@@ -1,13 +1,13 @@
-<a href="/forum" class="back-link">← חזרה</a>
+<a href="/forum" class="back-link">← דף הבית</a>
 
 <article class="thread">
   <h2><%= thread.title %></h2>
-
+  <br />
   <div class="thread-content"><%= thread.content %></div>
-
   <div class="meta">
-    נכתב על ידי <strong><%= thread.author || "אנונימי" %></strong>
-    · <%= new Date(thread.created_at).toLocaleString() %>
+    נכתב על ידי &nbsp;<strong><%= thread.author || "אנונימי" %></strong>
+    <!-- · <%= new Date(thread.created_at).toLocaleString() %> -->
+    &nbsp; <%= formatDate(thread.created_at) %>
   </div>
 </article>
 
@@ -22,7 +22,7 @@
     <li class="reply">
       <strong><%= r.author || "אנונימי" %></strong>
       <div><%= r.content %></div>
-
+      <%= formatDate(thread.created_at) %>
       <form
         action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
         method="POST"

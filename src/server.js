@@ -10,6 +10,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.locals.formatDate = (date) => {
+  return new Date(date).toLocaleString("he-IL", {
+    timeZone: "Asia/Jerusalem",
+  });
+};
+
 // If you want explicit config, you can pass options here.
 // For now this will read from env: PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT
 const pool = new Pool();
@@ -54,7 +60,7 @@ forum.get("/", async (req, res) => {
 
     // home.ejs should loop over "forums" (not threads anymore)
     res.render("home", {
-      title: "Mini Forum",
+      title: "PITRON HALOMOT",
       forums,
     });
   } catch (err) {
@@ -109,6 +115,29 @@ forum.get("/f/:id", async (req, res) => {
   }
 });
 
+//NEW THREAD PAGE
+
+forum.get("/f/:id/new", async (req, res) => {
+  const { id } = req.params;
+
+  // If you have forums table, fetch the forum
+  const { rows } = await pool.query(
+    `
+    SELECT * FROM forums WHERE id = $1
+  `,
+    [id]
+  );
+
+  const forum = rows[0];
+
+  res.render("new-thread", {
+    title: "פתיחת נושא חדש",
+    forum,
+  });
+});
+
+// POST THREAD
+
 forum.post("/f/:forumId/threads", async (req, res) => {
   const forumId = Number(req.params.forumId);
   const { title, author, content } = req.body;
@@ -124,6 +153,26 @@ forum.post("/f/:forumId/threads", async (req, res) => {
     );
 
     res.redirect(`/forum/thread/${result.rows[0].id}`);
+  } catch (err) {
+    console.error("Error creating thread:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+forum.post("/f/:id/threads", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, author, content } = req.body;
+
+    await pool.query(
+      `
+    INSERT INTO threads (forum_id, title, author, body)
+    VALUES ($1, $2, $3, $4)
+  `,
+      [id, title, author || "אנונימי", content]
+    );
+
+    res.redirect(`/forum/f/${id}`);
   } catch (err) {
     console.error("Error creating thread:", err);
     res.status(500).send("Server error");
@@ -237,6 +286,31 @@ forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
     console.error("Error deleting reply:", err);
     res.status(500).send("Server error");
   }
+});
+
+// FETCH NEW POSTS FROM ALL FORUMS
+
+forum.get("/new-posts", async (req, res) => {
+  const { rows: posts } = await pool.query(`
+    SELECT 
+      t.id,
+      t.title,
+      t.author,
+      t.created_at,
+      f.id AS forum_id,
+      f.name AS forum_name,
+      (
+        SELECT COUNT(*) FROM replies r WHERE r.thread_id = t.id
+      ) AS reply_count
+    FROM threads t
+    JOIN forums f ON f.id = t.forum_id
+    ORDER BY t.created_at DESC
+  `);
+
+  res.render("new-posts", {
+    title: "פוסטים אחרונים",
+    posts,
+  });
 });
 
 /* MOUNT ROUTER */

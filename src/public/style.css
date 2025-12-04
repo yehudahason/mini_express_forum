@@ -163,7 +163,7 @@ section.threads {
   color: #9ca3af;
 }
 
-/* ===== New thread / new reply forms ===== */
+/* ===== Forms ===== */
 section.new-thread,
 section.new-reply {
   margin-top: 2rem;
@@ -244,11 +244,7 @@ button:active {
     0 0 0 1px rgba(191, 219, 254, 0.2);
 }
 
-form .btn {
-  text-align: right;
-}
-
-/* Delete buttons (red variant) */
+/* Delete buttons */
 button.delete-btn,
 button.delete-thread-btn {
   background: linear-gradient(135deg, #b91c1c, #dc2626);
@@ -276,12 +272,106 @@ button.delete-thread-btn {
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
 }
 
-/* Extra spacing for thread delete on thread page */
 .delete-thread-btn {
   margin-top: 1rem;
 }
 
-/* ===== Single thread page ===== */
+/* ===== New Thread Button ===== */
+.new-thread-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0;
+  transition: 0.2s ease;
+}
+
+.new-thread-btn:hover {
+  background: #1e40af;
+}
+
+.new-thread-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Latest Posts Button ===== */
+.btn-latest {
+  display: inline-block;
+  background: #6366f1;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: 0.2s;
+}
+
+.btn-latest:hover {
+  background: #4338ca;
+}
+
+/* ===== Improved Latest Posts (FINAL) ===== */
+.latest-posts {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.post-item {
+  background: radial-gradient(circle at top left, #1e3a8a 0%, #0f172a 80%);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  transition: 0.2s ease-out;
+  box-shadow: 0 8px 25px rgba(2, 6, 23, 0.7);
+}
+
+.post-item:hover {
+  border-color: #60a5fa;
+  background: radial-gradient(circle at top left, #1d4ed8 0%, #020617 80%);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(30, 58, 138, 0.6);
+}
+
+.post-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: 0.15s ease;
+}
+
+.post-title:hover {
+  color: #93c5fd;
+}
+
+.post-item .meta {
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.post-item .meta a {
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+.post-item .meta a:hover {
+  text-decoration: underline;
+  color: #bfdbfe;
+}
+
+/* ===== Single Thread Page ===== */
 article.thread {
   padding: 1rem 1rem 1.2rem;
   margin-bottom: 1.5rem;
@@ -341,7 +431,7 @@ section.replies {
   color: #d1d5db;
 }
 
-/* ===== Small screen tweaks ===== */
+/* ===== Small Screens ===== */
 @media (max-width: 480px) {
   header {
     padding-inline: 1rem;

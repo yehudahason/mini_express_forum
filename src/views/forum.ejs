@@ -3,16 +3,19 @@
 </header>
 
 <main>
-  <a href="/forum" class="back-link">← חזרה</a>
+  <a href="/forum" class="back-link">← עמוד ראשי</a>
 
   <h1 class="page-title"><%= forum.name %></h1>
 
   <% if (forum.description) { %>
   <p class="meta"><%= forum.description %></p>
   <% } %>
+  <a href="/forum/f/<%= forum.id %>/new" class="new-thread-btn">
+    ✏️ פתיחת נושא חדש
+  </a>
 
   <!-- NEW THREAD FORM -->
-  <section class="new-thread">
+  <!-- <section class="new-thread">
     <h2>פתיחת נושא חדש</h2>
 
     <form action="/forum/f/<%= forum.id %>/threads" method="POST">
@@ -24,7 +27,7 @@
 
       <button type="submit">פרסום נושא</button>
     </form>
-  </section>
+  </section> -->
 
   <!-- THREAD LIST -->
   <section class="threads">
