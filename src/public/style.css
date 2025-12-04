@@ -72,6 +72,7 @@ main {
 }
 
 /* ===== Typography ===== */
+h1,
 h2,
 h3 {
   font-weight: 600;
@@ -84,7 +85,37 @@ p {
   margin: 0;
 }
 
-/* ===== Thread list (home) ===== */
+/* ===== Page Titles ===== */
+.page-title {
+  color: #f9fafb;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+}
+
+/* ===== Back Button ===== */
+.back-link {
+  color: #93c5fd;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #bfdbfe;
+}
+
+/* ===== Empty state ===== */
+.empty {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ===== Forum / thread lists ===== */
 section.threads {
   margin-bottom: 2rem;
 }
@@ -130,13 +161,6 @@ section.threads {
 .thread-list .meta {
   font-size: 0.78rem;
   color: #9ca3af;
-}
-
-.empty {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #9ca3af;
-  font-style: italic;
 }
 
 /* ===== New thread / new reply forms ===== */
@@ -189,7 +213,7 @@ form textarea:focus {
   background: rgba(15, 23, 42, 1);
 }
 
-/* Buttons */
+/* ===== Buttons ===== */
 button {
   justify-self: center;
   padding: 0.55rem 1.3rem;
@@ -223,6 +247,40 @@ button:active {
 form .btn {
   text-align: right;
 }
+
+/* Delete buttons (red variant) */
+button.delete-btn,
+button.delete-thread-btn {
+  background: linear-gradient(135deg, #b91c1c, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+.delete-btn:hover,
+.delete-thread-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.delete-btn:active,
+.delete-thread-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+}
+
+/* Extra spacing for thread delete on thread page */
+.delete-thread-btn {
+  margin-top: 1rem;
+}
+
 /* ===== Single thread page ===== */
 article.thread {
   padding: 1rem 1rem 1.2rem;
@@ -252,7 +310,7 @@ article.thread .meta {
   text-align: right;
 }
 
-/* Replies */
+/* ===== Replies ===== */
 section.replies {
   margin-bottom: 1.5rem;
 }
@@ -281,28 +339,6 @@ section.replies {
   margin-top: 0.25rem;
   font-size: 0.9rem;
   color: #d1d5db;
-}
-
-/* ===== Page Titles ===== */
-.page-title {
-  color: #f9fafb;
-  font-size: 1.4rem;
-  letter-spacing: 0.02em;
-  margin-bottom: 1rem;
-}
-
-/* ===== Back Button ===== */
-.back-link {
-  color: #93c5fd;
-  text-decoration: none;
-  font-size: 0.9rem;
-  display: inline-block;
-  margin-bottom: 1rem;
-  transition: color 0.2s ease;
-}
-
-.back-link:hover {
-  color: #bfdbfe;
 }
 
 /* ===== Small screen tweaks ===== */

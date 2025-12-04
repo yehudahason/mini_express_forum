@@ -1,35 +1,25 @@
-<section class="new-thread">
-  <h2>נושא חדש</h2>
+<header>
+  <!-- <h1><a href="/forum">Mini Forum</a></h1> -->
+</header>
 
-  <form method="POST" action="/forum/threads">
-    <input type="text" name="title" placeholder="כותרת" required />
-    <input type="text" name="author" placeholder="שם" />
-    <textarea
-      name="content"
-      placeholder="Write your message..."
-      required
-    ></textarea>
+<main>
+  <h1 class="page-title">פורומים</h1>
 
-    <button class="btn">הוסף דיון</button>
-  </form>
-</section>
-<h2 class="page-title">הודעות חדשות</h2>
-<section class="threads">
-  <% if (threads.length === 0) { %>
-  <p class="empty">אין שירשורים פתח חדש</p>
+  <% if (!forums || forums.length === 0) { %>
+  <p class="empty">לא קיימים פורומים.</p>
   <% } else { %>
   <ul class="thread-list">
-    <% threads.forEach(t => { %>
+    <% forums.forEach(f => { %>
     <li>
-      <a class="thread-title" href="/forum/thread/<%= t.id %>">
-        <%= t.title %>
-      </a>
+      <a class="thread-title" href="/forum/f/<%= f.id %>"> <%= f.name %> </a>
 
-      <div class="meta">
-        by <%= t.author || "Anonymous" %> — <%= t.reply_count %> replies
-      </div>
+      <% if (f.description) { %>
+      <div class="meta"><%= f.description %></div>
+      <% } %>
+
+      <a class="thread-title" href="/forum/f/<%= f.id %>"> כניסה לפורום → </a>
     </li>
     <% }) %>
   </ul>
   <% } %>
-</section>
+</main>
