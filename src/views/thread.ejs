@@ -1,4 +1,4 @@
-<a href="/" class="back-link"> ← חזרה לדף הבית </a>
+<a href="/forum" class="back-link"> ← חזרה לדף הבית </a>
 
 <article class="thread">
   <h2><%= thread.title %></h2>
@@ -29,10 +29,10 @@
 <section class="new-reply">
   <h3>הוסף תגובה</h3>
 
-  <form method="POST" action="/thread/<%= thread.id %>/replies">
+  <form method="POST" action="/forum/thread/<%= thread.id %>/replies">
     <input type="text" name="author" placeholder="שם" />
     <textarea name="content" placeholder="תגובה" required></textarea>
 
-    <button>Reply</button>
+    <button>שלח תגובה</button>
   </form>
 </section>

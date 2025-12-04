@@ -11,17 +11,24 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const pool = new Pool();
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+/* Create forum router */
+const forum = express.Router();
 
+app.use(express.urlencoded({ extended: true }));
+
+// Static files (CSS, JS, images) under /forum
+app.use("/forum", express.static(path.join(__dirname, "public")));
+
+// Setup EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
-// enable layouts
 app.use(expressLayouts);
 app.set("layout", "layout");
+
+/* ---- ROUTES NOW UNDER forum router ---- */
+
 /* HOME PAGE */
-app.get("/", async (req, res) => {
+forum.get("/", async (req, res) => {
   const { rows: threads } = await pool.query(`
     SELECT 
       t.id,
@@ -39,7 +46,7 @@ app.get("/", async (req, res) => {
 });
 
 /* CREATE THREAD */
-app.post("/threads", async (req, res) => {
+forum.post("/threads", async (req, res) => {
   const { title, author, content } = req.body;
 
   const result = await pool.query(
@@ -51,11 +58,11 @@ app.post("/threads", async (req, res) => {
     [title, author || null, content]
   );
 
-  res.redirect(`/thread/${result.rows[0].id}`);
+  res.redirect(`/forum/thread/${result.rows[0].id}`);
 });
 
 /* VIEW THREAD PAGE */
-app.get("/thread/:id", async (req, res) => {
+forum.get("/thread/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   const { rows: threadRows } = await pool.query(
@@ -80,7 +87,7 @@ app.get("/thread/:id", async (req, res) => {
 });
 
 /* POST A REPLY */
-app.post("/thread/:id/replies", async (req, res) => {
+forum.post("/thread/:id/replies", async (req, res) => {
   const { author, content } = req.body;
   const id = Number(req.params.id);
 
@@ -92,9 +99,13 @@ app.post("/thread/:id/replies", async (req, res) => {
     [id, author || null, content]
   );
 
-  res.redirect(`/thread/${id}`);
+  res.redirect(`/forum/thread/${id}`);
 });
 
-app.listen(process.env.PORT, () =>
+/* ---- MOUNT ROUTER ---- */
+app.use("/forum", forum);
+
+/* ---- START SERVER ---- */
+app.listen(process.env.PORT, "0.0.0.0", () =>
   console.log(`Forum running on http://localhost:${process.env.PORT}`)
 );
