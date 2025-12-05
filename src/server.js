@@ -184,17 +184,32 @@ forum.get("/thread/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
+    // const { rows: threadRows } = await pool.query(
+    //   `SELECT * FROM threads WHERE id = $1`,
+    //   [id]
+    // );
+
     const { rows: threadRows } = await pool.query(
-      `SELECT * FROM threads WHERE id = $1`,
+      `
+  SELECT
+    id,
+    title,
+    content,
+    author,
+    forum_id,
+    created_at
+  FROM threads
+  WHERE id = $1
+  `,
       [id]
     );
-
     if (threadRows.length === 0) {
       return res.status(404).send("Not found");
     }
 
     const thread = threadRows[0];
-
+    const forumId = thread.forum_id;
+    console.log(forumId);
     const { rows: replies } = await pool.query(
       `
       SELECT *
@@ -209,6 +224,7 @@ forum.get("/thread/:id", async (req, res) => {
       title: thread.title,
       thread,
       replies,
+      forumId,
     });
   } catch (err) {
     console.error("Error loading thread:", err);
@@ -319,6 +335,7 @@ app.use("/forum", forum);
 /* START SERVER */
 const PORT = process.env.PORT || 3333;
 
+console.log("Connecting to:", process.env.PGHOST, process.env.PGPORT);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Forum running on http://localhost:${PORT}`);
 });

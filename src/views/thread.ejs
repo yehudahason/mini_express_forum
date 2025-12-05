@@ -1,52 +1,56 @@
-<a href="/forum" class="back-link">עמוד ראשי ← </a>
-<article class="thread">
-  <h2><%= thread.title %></h2>
-  <br />
-  <div class="thread-content"><%= thread.content %></div>
-  <div class="meta">
-    נכתב על ידי &nbsp;<strong><%= thread.author || "אנונימי" %></strong>
-    <!-- · <%= new Date(thread.created_at).toLocaleString() %> -->
-    &nbsp; <%= formatDate(thread.created_at) %>
-  </div>
-</article>
+<main>
+  <a href="/forum" class="back-link">עמוד ראשי ← </a>
+  <a href="/forum/f/<%= forumId %>" class="back-link"> &nbsp; חזרה לפורום ←</a>
+  <h1><%= forumId %></h1>
+  <article class="thread">
+    <h2><%= thread.title %></h2>
+    <br />
+    <div class="thread-content"><%= thread.content %></div>
+    <div class="meta">
+      נכתב על ידי &nbsp;<strong><%= thread.author || "אנונימי" %></strong>
+      <!-- · <%= new Date(thread.created_at).toLocaleString() %> -->
+      &nbsp; <%= formatDate(thread.created_at) %>
+    </div>
+  </article>
 
-<section class="replies">
-  <h3>תגובות</h3>
+  <section class="replies">
+    <h3>תגובות</h3>
 
-  <% if (replies.length === 0) { %>
-  <p class="empty">אין תגובות עדיין.</p>
-  <% } else { %>
-  <ul class="reply-list">
-    <% replies.forEach(r => { %>
-    <li class="reply">
-      <strong><%= r.author || "אנונימי" %></strong>
-      <div><%= r.content %></div>
-      <%= formatDate(thread.created_at) %>
-      <form
-        action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
-        method="POST"
-        style="margin-top: 0.4rem"
-      >
-        <button class="delete-btn" onclick="return confirm('למחוק תגובה?');">
-          מחיקה
-        </button>
-      </form>
-    </li>
-    <% }) %>
-  </ul>
-  <% } %>
-</section>
+    <% if (replies.length === 0) { %>
+    <p class="empty">אין תגובות עדיין.</p>
+    <% } else { %>
+    <ul class="reply-list">
+      <% replies.forEach(r => { %>
+      <li class="reply">
+        <strong><%= r.author || "אנונימי" %></strong>
+        <div><%= r.content %></div>
+        <%= formatDate(thread.created_at) %>
+        <form
+          action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
+          method="POST"
+          style="margin-top: 0.4rem"
+        >
+          <button class="delete-btn" onclick="return confirm('למחוק תגובה?');">
+            מחיקה
+          </button>
+        </form>
+      </li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </section>
 
-<section class="new-reply">
-  <h3>הוסף תגובה</h3>
+  <section class="new-reply">
+    <h3>הוסף תגובה</h3>
 
-  <form method="POST" action="/forum/thread/<%= thread.id %>/replies">
-    <input type="text" name="author" placeholder="שם" />
-    <textarea name="content" placeholder="כתוב תגובה..." required></textarea>
-    <button type="submit">שלח תגובה</button>
-  </form>
+    <form method="POST" action="/forum/thread/<%= thread.id %>/replies">
+      <input type="text" name="author" placeholder="שם" />
+      <textarea name="content" placeholder="כתוב תגובה..." required></textarea>
+      <button type="submit">שלח תגובה</button>
+    </form>
 
-  <form action="/forum/thread/<%= thread.id %>/delete" method="POST">
-    <button class="delete-thread-btn">מחיקת נושא</button>
-  </form>
-</section>
+    <form action="/forum/thread/<%= thread.id %>/delete" method="POST">
+      <button class="delete-thread-btn">מחיקת נושא</button>
+    </form>
+  </section>
+</main>
