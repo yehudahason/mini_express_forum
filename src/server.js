@@ -1,39 +1,26 @@
 import "dotenv/config";
 import express from "express";
 import path from "path";
-import { Pool } from "pg";
 import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
+
+import { sequelize } from "./models/index.js";
+import { Forum, Thread, Reply } from "./models/associations.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
+/* ==== DATE FORMAT LOCAL HELPER ==== */
 app.locals.formatDate = (date) => {
   return new Date(date).toLocaleString("he-IL", {
     timeZone: "Asia/Jerusalem",
   });
 };
 
-// If you want explicit config, you can pass options here.
-// For now this will read from env: PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT
-const pool = new Pool();
-
-/* Create forum router */
-const forum = express.Router();
-
-// Parse form bodies
+/* ==== EXPRESS SETUP ==== */
 app.use(express.urlencoded({ extended: true }));
-
-// Static files (CSS, JS, images) under /forum
-app.use("/forum", express.static(path.join(__dirname, "public")));
-
-// Setup EJS
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(expressLayouts);
-app.set("layout", "layout");
 
 app.use(
   "/forum",
@@ -43,22 +30,23 @@ app.use(
     lastModified: false,
   })
 );
-/* ================================
-   ROUTES
-   ================================ */
 
-/* HOME PAGE – list forums */
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(expressLayouts);
+app.set("layout", "layout");
+
+const forum = express.Router();
+
+/* ======================================================
+   HOME PAGE — LIST FORUMS
+====================================================== */
 forum.get("/", async (req, res) => {
   try {
-    const { rows: forums } = await pool.query(
-      `
-      SELECT id, name, slug, description
-      FROM forums
-      ORDER BY id ASC
-      `
-    );
+    const forums = await Forum.findAll({
+      order: [["id", "ASC"]],
+    });
 
-    // home.ejs should loop over "forums" (not threads anymore)
     res.render("home", {
       title: "PITRON HALOMOT",
       forums,
@@ -69,40 +57,30 @@ forum.get("/", async (req, res) => {
   }
 });
 
-/* FORUM PAGE – list threads in a forum */
+/* ======================================================
+   FORUM PAGE — LIST THREADS INSIDE A FORUM
+====================================================== */
 forum.get("/f/:id", async (req, res) => {
   const forumId = Number(req.params.id);
 
   try {
-    // forum info
-    const { rows: forumRows } = await pool.query(
-      `SELECT * FROM forums WHERE id = $1`,
-      [forumId]
-    );
+    const forumData = await Forum.findByPk(forumId);
+    if (!forumData) return res.status(404).send("Forum not found");
 
-    if (forumRows.length === 0) {
-      return res.status(404).send("Forum not found");
-    }
-
-    const forumData = forumRows[0];
-
-    // threads in this forum
-    const { rows: threads } = await pool.query(
-      `
-      SELECT 
-        t.id,
-        t.title,
-        t.author,
-        t.created_at,
-        COUNT(r.id) AS reply_count
-      FROM threads t
-      LEFT JOIN replies r ON r.thread_id = t.id
-      WHERE t.forum_id = $1
-      GROUP BY t.id
-      ORDER BY t.created_at DESC
-      `,
-      [forumId]
-    );
+    const threads = await Thread.findAll({
+      where: { forum_id: forumId },
+      order: [["created_at", "DESC"]],
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`
+            (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
+            `),
+            "reply_count",
+          ],
+        ],
+      },
+    });
 
     res.render("forum", {
       title: forumData.name,
@@ -115,116 +93,63 @@ forum.get("/f/:id", async (req, res) => {
   }
 });
 
-//NEW THREAD PAGE
-
+/* ======================================================
+   NEW THREAD PAGE
+====================================================== */
 forum.get("/f/:id/new", async (req, res) => {
-  const { id } = req.params;
+  const forumId = Number(req.params.id);
 
-  // If you have forums table, fetch the forum
-  const { rows } = await pool.query(
-    `
-    SELECT * FROM forums WHERE id = $1
-  `,
-    [id]
-  );
-
-  const forum = rows[0];
+  const forumData = await Forum.findByPk(forumId);
+  if (!forumData) return res.status(404).send("Forum not found");
 
   res.render("new-thread", {
     title: "פתיחת נושא חדש",
-    forum,
+    forum: forumData,
   });
 });
 
-// POST THREAD
-
+/* ======================================================
+   POST NEW THREAD
+====================================================== */
 forum.post("/f/:forumId/threads", async (req, res) => {
   const forumId = Number(req.params.forumId);
   const { title, author, content } = req.body;
 
   try {
-    const result = await pool.query(
-      `
-      INSERT INTO threads (title, author, content, forum_id)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id
-      `,
-      [title, author || null, content, forumId] // 👈 add forumId here
-    );
+    const thread = await Thread.create({
+      forum_id: forumId,
+      title,
+      author: author || null,
+      content,
+    });
 
-    res.redirect(`/forum/thread/${result.rows[0].id}`);
+    res.redirect(`/forum/thread/${thread.id}`);
   } catch (err) {
     console.error("Error creating thread:", err);
     res.status(500).send("Server error");
   }
 });
 
-forum.post("/f/:id/threads", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, author, content } = req.body;
-
-    await pool.query(
-      `
-    INSERT INTO threads (forum_id, title, author, body)
-    VALUES ($1, $2, $3, $4)
-  `,
-      [id, title, author || "אנונימי", content]
-    );
-
-    res.redirect(`/forum/f/${id}`);
-  } catch (err) {
-    console.error("Error creating thread:", err);
-    res.status(500).send("Server error");
-  }
-});
-
-/* VIEW THREAD PAGE */
+/* ======================================================
+   VIEW THREAD PAGE
+====================================================== */
 forum.get("/thread/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const threadId = Number(req.params.id);
 
   try {
-    // const { rows: threadRows } = await pool.query(
-    //   `SELECT * FROM threads WHERE id = $1`,
-    //   [id]
-    // );
+    const thread = await Thread.findByPk(threadId);
+    if (!thread) return res.status(404).send("Thread not found");
 
-    const { rows: threadRows } = await pool.query(
-      `
-  SELECT
-    id,
-    title,
-    content,
-    author,
-    forum_id,
-    created_at
-  FROM threads
-  WHERE id = $1
-  `,
-      [id]
-    );
-    if (threadRows.length === 0) {
-      return res.status(404).send("Not found");
-    }
-
-    const thread = threadRows[0];
-    const forumId = thread.forum_id;
-    console.log(forumId);
-    const { rows: replies } = await pool.query(
-      `
-      SELECT *
-      FROM replies
-      WHERE thread_id = $1
-      ORDER BY created_at ASC
-      `,
-      [id]
-    );
+    const replies = await Reply.findAll({
+      where: { thread_id: threadId },
+      order: [["created_at", "ASC"]],
+    });
 
     res.render("thread", {
       title: thread.title,
       thread,
       replies,
-      forumId,
+      forumId: thread.forum_id,
     });
   } catch (err) {
     console.error("Error loading thread:", err);
@@ -232,49 +157,41 @@ forum.get("/thread/:id", async (req, res) => {
   }
 });
 
-/* POST A REPLY */
+/* ======================================================
+   POST A REPLY
+====================================================== */
 forum.post("/thread/:id/replies", async (req, res) => {
+  const threadId = Number(req.params.id);
   const { author, content } = req.body;
-  const id = Number(req.params.id);
 
   try {
-    await pool.query(
-      `
-      INSERT INTO replies (thread_id, author, content)
-      VALUES ($1, $2, $3)
-      `,
-      [id, author || null, content]
-    );
+    await Reply.create({
+      thread_id: threadId,
+      author: author || null,
+      content,
+    });
 
-    res.redirect(`/forum/thread/${id}`);
+    res.redirect(`/forum/thread/${threadId}`);
   } catch (err) {
     console.error("Error creating reply:", err);
     res.status(500).send("Server error");
   }
 });
 
-/* DELETE THREAD */
+/* ======================================================
+   DELETE THREAD
+====================================================== */
 forum.post("/thread/:id/delete", async (req, res) => {
-  const id = Number(req.params.id);
+  const threadId = Number(req.params.id);
 
   try {
-    // First get forum_id so we can redirect back to the forum page
-    const { rows } = await pool.query(
-      `SELECT forum_id FROM threads WHERE id = $1`,
-      [id]
-    );
+    const thread = await Thread.findByPk(threadId);
+    if (!thread) return res.status(404).send("Thread not found");
 
-    if (rows.length === 0) {
-      return res.status(404).send("Thread not found");
-    }
+    const forumId = thread.forum_id;
 
-    const forumId = rows[0].forum_id;
-
-    // Delete replies
-    await pool.query(`DELETE FROM replies WHERE thread_id = $1`, [id]);
-
-    // Delete thread
-    await pool.query(`DELETE FROM threads WHERE id = $1`, [id]);
+    await Reply.destroy({ where: { thread_id: threadId } });
+    await Thread.destroy({ where: { id: threadId } });
 
     res.redirect(`/forum/f/${forumId}`);
   } catch (err) {
@@ -283,19 +200,19 @@ forum.post("/thread/:id/delete", async (req, res) => {
   }
 });
 
-/* DELETE REPLY */
+/* ======================================================
+   DELETE REPLY
+====================================================== */
 forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
-  const threadId = Number(req.params.threadId);
-  const replyId = Number(req.params.replyId);
+  const { threadId, replyId } = req.params;
 
   try {
-    await pool.query(
-      `
-      DELETE FROM replies
-      WHERE id = $1 AND thread_id = $2
-      `,
-      [replyId, threadId]
-    );
+    await Reply.destroy({
+      where: {
+        id: replyId,
+        thread_id: threadId,
+      },
+    });
 
     res.redirect(`/forum/thread/${threadId}`);
   } catch (err) {
@@ -304,38 +221,60 @@ forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
   }
 });
 
-// FETCH NEW POSTS FROM ALL FORUMS
-
+/* ======================================================
+   FETCH NEW POSTS ACROSS ALL FORUMS
+====================================================== */
 forum.get("/new-posts", async (req, res) => {
-  const { rows: posts } = await pool.query(`
-    SELECT 
-      t.id,
-      t.title,
-      t.author,
-      t.created_at,
-      f.id AS forum_id,
-      f.name AS forum_name,
-      (
-        SELECT COUNT(*) FROM replies r WHERE r.thread_id = t.id
-      ) AS reply_count
-    FROM threads t
-    JOIN forums f ON f.id = t.forum_id
-    ORDER BY t.created_at DESC
-  `);
+  try {
+    const posts = await Thread.findAll({
+      include: [
+        {
+          model: Forum,
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [["created_at", "DESC"]],
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`
+    (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
+  `),
+            "reply_count",
+          ],
+        ],
+      },
+    });
 
-  res.render("new-posts", {
-    title: "פוסטים אחרונים",
-    posts,
-  });
+    res.render("new-posts", {
+      title: "פוסטים אחרונים",
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    res.status(500).send("Server error");
+  }
 });
 
-/* MOUNT ROUTER */
+/* ======================================================
+   MOUNT ROUTER
+====================================================== */
 app.use("/forum", forum);
 
-/* START SERVER */
+/* ======================================================
+   START SERVER
+====================================================== */
 const PORT = process.env.PORT || 3333;
 
-console.log("Connecting to:", process.env.PGHOST, process.env.PGPORT);
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Forum running on http://localhost:${PORT}`);
-});
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Connected to PostgreSQL via Sequelize!");
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Forum running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("DB connection error:", err);
+  }
+})();

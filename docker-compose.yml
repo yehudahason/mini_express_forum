@@ -26,7 +26,7 @@ services:
       - /app/node_modules
 
   db:
-    image: postgres:17
+    image: postgres:latest
     container_name: forum_postgres
     restart: always
     environment:
@@ -36,7 +36,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data2:/var/lib/postgresql
 
   pgadmin:
     image: elestio/pgadmin:latest
@@ -53,5 +53,5 @@ services:
       - pgadmin_data2:/var/lib/pgadmin
 
 volumes:
-  postgres_data:
+  postgres_data2:
   pgadmin_data2:
