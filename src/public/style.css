@@ -425,7 +425,7 @@ section.replies {
 }
 
 /* ===== Small Screens ===== */
-@media (max-width: 480px) {
+@media (max-width: 678px) {
   html,
   body {
     font-size: 22px;
