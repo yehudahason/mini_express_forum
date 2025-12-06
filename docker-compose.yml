@@ -39,7 +39,7 @@ services:
       - postgres_data2:/var/lib/postgresql
 
   pgadmin:
-    image: elestio/pgadmin:latest
+    image: dpage/pgadmin4:9.10
     container_name: forum_pgadmin
     restart: always
     environment:
@@ -50,8 +50,8 @@ services:
     depends_on:
       - db
     volumes:
-      - pgadmin_data2:/var/lib/pgadmin
+      - pgadmin_data3:/var/lib/pgadmin
 
 volumes:
   postgres_data2:
-  pgadmin_data2:
+  pgadmin_data3:

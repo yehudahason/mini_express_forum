@@ -28,7 +28,7 @@ body {
 
 /* ===== Layout ===== */
 header {
-  position: sticky;
+  /* position: sticky; */
   top: 0;
   z-index: 10;
   background: rgba(15, 23, 42, 0.9);
@@ -74,6 +74,17 @@ h3 {
   text-align: right;
 }
 
+h1 {
+  text-align: center;
+}
+h4 {
+  text-align: center;
+  color: bisque;
+}
+
+img.logo {
+  width: 1.3rem;
+}
 p {
   margin: 0;
 }
