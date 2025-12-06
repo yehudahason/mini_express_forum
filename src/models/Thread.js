@@ -30,6 +30,12 @@ Thread.init(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    reply_count: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.getDataValue("reply_count");
+      },
+    },
   },
   {
     sequelize,

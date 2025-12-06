@@ -1,6 +1,7 @@
 <main>
   <h1>פוסטים אחרונים</h1>
   <a href="/forum" class="back-link">עמוד ראשי ← </a>
+
   <ul class="latest-posts">
     <% posts.forEach(p => { %>
     <li class="post-item">
@@ -10,10 +11,11 @@
 
       <div class="meta">
         בפורום:
-        <a href="/forum/f/<%= p.forum_id %>"><%= p.forum_name %></a>
+        <a href="/forum/f/<%= p.Forum.id %>"> <%= p.Forum.name %> </a>
+
         | מאת <b><%= p.author || "אנונימי" %></b>
-        | <%= new Date(p.created_at).toLocaleString("he-IL", { timeZone:
-        "Asia/Jerusalem" }) %> | תגובות: <%= p.reply_count %>
+
+        | <%= formatDate(p.created_at) %> | תגובות: <%= p.reply_count %>
       </div>
     </li>
     <% }) %>

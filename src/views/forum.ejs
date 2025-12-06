@@ -10,28 +10,15 @@
     ✏️ פתיחת נושא חדש
   </a>
 
-  <!-- NEW THREAD FORM -->
-  <!-- <section class="new-thread">
-    <h2>פתיחת נושא חדש</h2>
-
-    <form action="/forum/f/<%= forum.id %>/threads" method="POST">
-      <input type="text" name="title" placeholder="כותרת" required />
-
-      <input type="text" name="author" placeholder="שם (לא חובה)" />
-
-      <textarea name="content" placeholder="תוכן ההודעה..." required></textarea>
-
-      <button type="submit">פרסום נושא</button>
-    </form>
-  </section> -->
-
   <!-- THREAD LIST -->
   <section class="threads">
     <h2>רשימת נושאים</h2>
-
     <% if (!threads || threads.length === 0) { %>
+
     <p class="empty">אין עדיין נושאים בפורום זה.</p>
+
     <% } else { %>
+
     <ul class="thread-list">
       <% threads.forEach(t => { %>
       <li>
@@ -40,12 +27,13 @@
         </a>
 
         <div class="meta">
-          מאת <%= t.author || "אנונימי" %> · <%= new
-          Date(t.created_at).toLocaleString() %> · תגובות: <%= t.reply_count %>
+          מאת <%= t.author || "אנונימי" %> · <%= formatDate(t.created_at) %> ·
+          תגובות: <%= t.reply_count %>
         </div>
       </li>
       <% }) %>
     </ul>
+
     <% } %>
   </section>
 </main>
