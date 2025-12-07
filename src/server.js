@@ -328,7 +328,10 @@ forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
       content,
     });
 
-    res.redirect(`/forum/thread/${threadId}`);
+    res.render("redirect", {
+      thread_id: threadId,
+      title: "redirect",
+    });
   } catch (err) {
     console.error("Error creating reply:", err);
     res.status(500).send("Server error");
