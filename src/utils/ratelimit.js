@@ -8,7 +8,11 @@ export const globalLimiter = rateLimit({
 
 // Limit thread creation: 1 per 2 minutes
 export const createThreadLimiter = rateLimit({
-  windowMs: 2 * 60 * 1000,
+  windowMs: 1 * 60 * 1000,
   max: 1,
-  message: "Please wait 2 minutes before posting again.",
+  message: `
+    <h3 style="text-align: center; margin: 1rem auto">
+      יש הגבלה של הודעה אחת לדקה אנא המתן
+    </h3>
+  `,
 });
