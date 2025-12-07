@@ -7,16 +7,12 @@ services:
     restart: always
     ports:
       - "3333:3333"
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
       HOST: 0.0.0.0
       PORT: 3333
-
-      PGHOST: db
-      PGUSER: user
-      PGPASSWORD: ${PGPASSWORD}
-      PGDATABASE: ${PGDATABASE}
-      PGPORT: 5432
 
     depends_on:
       - db
@@ -29,29 +25,41 @@ services:
     image: postgres:latest
     container_name: forum_postgres
     restart: always
+
+    # 🔥 Inject .env into Postgres container
+    env_file:
+      - .env
+
+    # Required by Postgres
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: ${PGUSER}
       POSTGRES_PASSWORD: ${PGPASSWORD}
-      POSTGRES_DB: mini_forum
+      POSTGRES_DB: ${PGDATABASE}
+
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data3:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4:9.10
     container_name: forum_pgadmin
     restart: always
+
+    env_file:
+      - .env
+
     environment:
-      PGADMIN_DEFAULT_EMAIL: 2@2.com
-      PGADMIN_DEFAULT_PASSWORD: 22
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+
     ports:
       - "2020:80"
     depends_on:
       - db
     volumes:
-      - pgadmin_data3:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
-  postgres_data3:
-  pgadmin_data3:
+  postgres_data:
+  pgadmin_data:
