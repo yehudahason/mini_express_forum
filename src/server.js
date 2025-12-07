@@ -20,13 +20,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.set("trust proxy", 1);
 
-/* ==== DATE FORMAT LOCAL HELPER ==== */
-app.locals.formatDate = (date) => {
+app.locals.formatDate = function (date) {
   return new Date(date).toLocaleString("he-IL", {
     timeZone: "Asia/Jerusalem",
+    hour12: false,
+    dateStyle: "short",
+    timeStyle: "short",
   });
 };
 
+app.use((req, res, next) => {
+  res.locals.formatDate = app.locals.formatDate;
+  next();
+});
 /* ==== EXPRESS SETUP ==== */
 app.use(express.urlencoded({ extended: true }));
 

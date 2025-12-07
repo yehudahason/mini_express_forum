@@ -24,7 +24,7 @@
       <li class="reply">
         <strong><%= r.author || "אנונימי" %></strong>
         <div><%- r.content %></div>
-        <%= formatDate(thread.created_at) %>
+        <%= formatDate(r.created_at) %>
         <!-- <form
           action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
           method="POST"

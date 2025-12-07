@@ -1,9 +1,17 @@
 FROM node:lts-alpine
 
+# Install timezone database so toLocaleString("Asia/Jerusalem") works
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Jerusalem
+
 WORKDIR /app
 
+# Install deps using cached layer
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Live-reload server using nodemon
+# Copy ALL app files (required!)
+COPY . .
+
+# Start dev server (nodemon)
 CMD ["npm", "run", "dev"]

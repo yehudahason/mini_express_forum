@@ -10,20 +10,17 @@ export const globalLimiter = rateLimit({
 export const createThreadLimiter = rateLimit({
   windowMs: 1 * 10 * 1000,
   max: 1,
-  message: `
-    <h3 style="text-align: center; margin: 1rem auto">
-      המתן 10 שניות
-    </h3>
-  `,
+  message: `<h3 style="text-align: center; margin: 1rem auto">המתן 10 שניות בין תגובות</h3>
+<div style="display: flex; justify-content: center">
+  <a href="/forum">Back home</a>
+</div>`,
 });
 
 export const searchLimiter = rateLimit({
-  windowMs: 1 * 10 * 1000,
+  windowMs: 1 * 5 * 1000,
   max: 1,
-  message: `
-    <h3 style="text-align: center; margin: 1rem auto">
-      המתן 10 שניות
-    </h3>
-    <a src="/forum"> דף הבית</a>
-  `,
+  message: `<h3 style="text-align: center; margin: 1rem auto">המתן 5 שניות בין חיפוש</h3>
+<div style="display: flex; justify-content: center">
+  <a href="/forum">Back home</a>
+</div>`,
 });
