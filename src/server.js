@@ -6,9 +6,14 @@ import expressLayouts from "express-ejs-layouts";
 
 import { sequelize } from "./models/index.js";
 import { Forum, Thread, Reply } from "./models/associations.js";
-import { globalLimiter, createThreadLimiter } from "./utils/ratelimit.js";
+import {
+  globalLimiter,
+  createThreadLimiter,
+  searchLimiter,
+} from "./utils/ratelimit.js";
 import sanitizeHtml from "sanitize-html";
 import { Op } from "sequelize";
+import { title } from "process";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -34,7 +39,7 @@ app.use(
   })
 );
 
-// app.use(globalLimiter);
+app.use(globalLimiter);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
@@ -134,7 +139,7 @@ forum.get("/f/:id/new", async (req, res) => {
 /* ======================================================
    POST NEW THREAD
 ====================================================== */
-forum.post("/f/:forumId/threads", async (req, res) => {
+forum.post("/f/:forumId/threads", createThreadLimiter, async (req, res) => {
   const forumId = Number(req.params.forumId);
 
   const title = sanitizeHtml(req.body.title, {
@@ -211,21 +216,23 @@ forum.get("/thread/:id", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-/* ======================================================
-   GLOBAL SEARCH — THREADS + REPLIES
-   GET /forum/search?q=keyword
-====================================================== */
-forum.get("/search", async (req, res) => {
+// ##################################
+// SEARCH FORUM THREAD AND REPLIES
+// /forum/search?q=qeury
+// ###################################
+forum.get("/search", searchLimiter, async (req, res) => {
   const q = req.query.q?.trim();
+
   if (!q) {
-    return res.status(400).json({ error: "Missing ?q= keyword" });
+    return res.render("search", {
+      query: "",
+      results: [],
+      title: "search",
+    });
   }
 
   try {
-    // ------------------------------------------
-    // 1) Find threads that match keyword
-    // ------------------------------------------
+    // 1 – search threads
     const matchingThreads = await Thread.findAll({
       where: {
         [Op.or]: [
@@ -234,13 +241,11 @@ forum.get("/search", async (req, res) => {
           { author: { [Op.iLike]: `%${q}%` } },
         ],
       },
-      order: [["created_at", "DESC"]],
+      limit: 20,
       raw: true,
     });
 
-    // ------------------------------------------
-    // 2) Find all replies that match keyword
-    // ------------------------------------------
+    // 2 – search replies
     const matchingReplies = await Reply.findAll({
       where: {
         [Op.or]: [
@@ -248,12 +253,11 @@ forum.get("/search", async (req, res) => {
           { author: { [Op.iLike]: `%${q}%` } },
         ],
       },
+      limit: 20,
       raw: true,
     });
 
-    // ------------------------------------------
-    // 3) Group replies by thread
-    // ------------------------------------------
+    // 3 – group replies by thread_id
     const repliesByThread = {};
     matchingReplies.forEach((r) => {
       if (!repliesByThread[r.thread_id]) {
@@ -262,12 +266,9 @@ forum.get("/search", async (req, res) => {
       repliesByThread[r.thread_id].push(r);
     });
 
-    // ------------------------------------------
-    // 4) Merge results (threads + replies)
-    // ------------------------------------------
+    // 4 – merge results
     const results = [];
 
-    // Add threads that matched directly
     matchingThreads.forEach((thread) => {
       results.push({
         thread,
@@ -276,10 +277,9 @@ forum.get("/search", async (req, res) => {
       });
     });
 
-    // Add threads whose replies matched but thread did NOT match
     Object.keys(repliesByThread).forEach((threadId) => {
-      const alreadyAdded = results.some((r) => r.thread.id == threadId);
-      if (!alreadyAdded) {
+      const exists = results.some((r) => r.thread.id == threadId);
+      if (!exists) {
         results.push({
           thread: { id: threadId },
           matchesInThread: false,
@@ -288,21 +288,22 @@ forum.get("/search", async (req, res) => {
       }
     });
 
-    res.json({
+    res.render("search", {
       query: q,
-      totalThreadsMatched: results.length,
       results,
+      title: "search",
+      formatDate: req.app.locals.formatDate, // optional formatter
     });
   } catch (err) {
     console.error("Search error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).send("Server error");
   }
 });
 
 /* ======================================================
    POST A REPLY
 ====================================================== */
-forum.post("/thread/:id/replies", async (req, res) => {
+forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
   const threadId = Number(req.params.id);
 
   const author = sanitizeHtml(req.body.author, {

@@ -303,6 +303,13 @@ button.delete-thread-btn {
   transform: scale(0.97);
 }
 
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  min-height: auto;
+  padding: 0.7rem 0;
+}
 /* ===== Latest Posts Button ===== */
 .btn-latest {
   display: inline-block;
@@ -320,6 +327,17 @@ button.delete-thread-btn {
   background: #4338ca;
 }
 
+.btn-search {
+  color: bisque;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+.btn-search img {
+  width: 1.8rem;
+}
 /* ===== Improved Latest Posts (FINAL) ===== */
 .latest-posts {
   list-style: none;
@@ -480,6 +498,66 @@ section.replies {
   font-size: 0.85rem;
   color: #e5e7eb;
   opacity: 0.9;
+}
+
+/* ===== Search Page ===== */
+.search-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+.search-form button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.search-results {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.search-item {
+  padding: 1rem;
+  background: rgba(30, 58, 138, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.search-item a {
+  color: white;
+}
+.reply-matches ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0 0;
+}
+
+.reply-match {
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid #3b82f6;
+  margin-bottom: 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+.meta-small {
+  font-size: 0.75rem;
+  opacity: 0.7;
 }
 
 /* ===== Small Screens ===== */
