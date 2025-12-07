@@ -145,15 +145,13 @@ section.threads {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out,
-    border-color 0.1s ease-out, background 0.1s ease-out;
 }
 
 .thread-list li:hover {
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.6);
   border-color: #60a5fa;
-  background: rgba(30, 64, 175, 0.2);
+  /* background: rgba(30, 64, 175, 0.2); */
 }
 
 .thread-list a {
@@ -359,7 +357,7 @@ button.delete-thread-btn {
 .post-item:hover {
   border-color: #60a5fa;
   background: radial-gradient(circle at top left, #1d4ed8 0%, #020617 80%);
-  transform: translateY(-3px);
+  /* transform: translateY(-3px); */
   box-shadow: 0 16px 40px rgba(30, 58, 138, 0.6);
 }
 
