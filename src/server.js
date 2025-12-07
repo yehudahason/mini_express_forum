@@ -8,7 +8,7 @@ import { sequelize } from "./models/index.js";
 import { Forum, Thread, Reply } from "./models/associations.js";
 import { globalLimiter, createThreadLimiter } from "./utils/ratelimit.js";
 import sanitizeHtml from "sanitize-html";
-
+import { Op } from "sequelize";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -61,9 +61,6 @@ forum.get("/", async (req, res) => {
   }
 });
 
-/* ======================================================
-   FORUM PAGE — LIST THREADS INSIDE A FORUM
-====================================================== */
 /* ======================================================
    API — LIST THREADS WITH PAGINATION
    GET /forum/f/:id?page=1
@@ -212,6 +209,93 @@ forum.get("/thread/:id", async (req, res) => {
   } catch (err) {
     console.error("Error loading thread:", err);
     res.status(500).send("Server error");
+  }
+});
+
+/* ======================================================
+   GLOBAL SEARCH — THREADS + REPLIES
+   GET /forum/search?q=keyword
+====================================================== */
+forum.get("/search", async (req, res) => {
+  const q = req.query.q?.trim();
+  if (!q) {
+    return res.status(400).json({ error: "Missing ?q= keyword" });
+  }
+
+  try {
+    // ------------------------------------------
+    // 1) Find threads that match keyword
+    // ------------------------------------------
+    const matchingThreads = await Thread.findAll({
+      where: {
+        [Op.or]: [
+          { title: { [Op.iLike]: `%${q}%` } },
+          { content: { [Op.iLike]: `%${q}%` } },
+          { author: { [Op.iLike]: `%${q}%` } },
+        ],
+      },
+      order: [["created_at", "DESC"]],
+      raw: true,
+    });
+
+    // ------------------------------------------
+    // 2) Find all replies that match keyword
+    // ------------------------------------------
+    const matchingReplies = await Reply.findAll({
+      where: {
+        [Op.or]: [
+          { content: { [Op.iLike]: `%${q}%` } },
+          { author: { [Op.iLike]: `%${q}%` } },
+        ],
+      },
+      raw: true,
+    });
+
+    // ------------------------------------------
+    // 3) Group replies by thread
+    // ------------------------------------------
+    const repliesByThread = {};
+    matchingReplies.forEach((r) => {
+      if (!repliesByThread[r.thread_id]) {
+        repliesByThread[r.thread_id] = [];
+      }
+      repliesByThread[r.thread_id].push(r);
+    });
+
+    // ------------------------------------------
+    // 4) Merge results (threads + replies)
+    // ------------------------------------------
+    const results = [];
+
+    // Add threads that matched directly
+    matchingThreads.forEach((thread) => {
+      results.push({
+        thread,
+        matchesInThread: true,
+        replyMatches: repliesByThread[thread.id] || [],
+      });
+    });
+
+    // Add threads whose replies matched but thread did NOT match
+    Object.keys(repliesByThread).forEach((threadId) => {
+      const alreadyAdded = results.some((r) => r.thread.id == threadId);
+      if (!alreadyAdded) {
+        results.push({
+          thread: { id: threadId },
+          matchesInThread: false,
+          replyMatches: repliesByThread[threadId],
+        });
+      }
+    });
+
+    res.json({
+      query: q,
+      totalThreadsMatched: results.length,
+      results,
+    });
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
