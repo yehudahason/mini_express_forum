@@ -6,6 +6,7 @@ import expressLayouts from "express-ejs-layouts";
 
 import { sequelize } from "./models/index.js";
 import { Forum, Thread, Reply } from "./models/associations.js";
+import { globalLimiter, createThreadLimiter } from "./utils/ratelimit.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,7 @@ app.use(
   })
 );
 
+app.use(globalLimiter);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
@@ -111,7 +113,7 @@ forum.get("/f/:id/new", async (req, res) => {
 /* ======================================================
    POST NEW THREAD
 ====================================================== */
-forum.post("/f/:forumId/threads", async (req, res) => {
+forum.post("/f/:forumId/threads", createThreadLimiter, async (req, res) => {
   const forumId = Number(req.params.forumId);
   const { title, author, content } = req.body;
 
@@ -160,7 +162,7 @@ forum.get("/thread/:id", async (req, res) => {
 /* ======================================================
    POST A REPLY
 ====================================================== */
-forum.post("/thread/:id/replies", async (req, res) => {
+forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
   const threadId = Number(req.params.id);
   const { author, content } = req.body;
 
