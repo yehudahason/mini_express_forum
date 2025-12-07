@@ -381,6 +381,7 @@ forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
 /* ======================================================
    FETCH NEW POSTS ACROSS ALL FORUMS
 ====================================================== */
+
 forum.get("/new-posts", async (req, res) => {
   try {
     const posts = await Thread.findAll({
@@ -390,17 +391,31 @@ forum.get("/new-posts", async (req, res) => {
           attributes: ["id", "name"],
         },
       ],
-      order: [["created_at", "DESC"]],
       attributes: {
         include: [
+          // Count replies
           [
             sequelize.literal(`
-    (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
-  `),
+              (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
+            `),
             "reply_count",
+          ],
+
+          // Latest activity (reply OR thread creation)
+          [
+            sequelize.literal(`
+              COALESCE(
+                (SELECT MAX(r.created_at) FROM replies r WHERE r.thread_id = "Thread"."id"),
+                "Thread"."created_at"
+              )
+            `),
+            "latest_activity",
           ],
         ],
       },
+
+      // Sort by latest activity DESC (newest first)
+      order: [[sequelize.literal("latest_activity"), "DESC"]],
     });
 
     res.render("new-posts", {
