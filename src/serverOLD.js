@@ -34,7 +34,7 @@ app.use(
   })
 );
 
-// app.use(globalLimiter);
+app.use(globalLimiter);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
@@ -64,43 +64,22 @@ forum.get("/", async (req, res) => {
 /* ======================================================
    FORUM PAGE — LIST THREADS INSIDE A FORUM
 ====================================================== */
-/* ======================================================
-   API — LIST THREADS WITH PAGINATION
-   GET /forum/f/:id?page=1
-====================================================== */
-
 forum.get("/f/:id", async (req, res) => {
   const forumId = Number(req.params.id);
 
-  // Pagination params
-  const page = Number(req.query.page) || 1;
-  const limit = 10; // threads per page
-  const offset = (page - 1) * limit;
-
   try {
-    // Load forum info
     const forumData = await Forum.findByPk(forumId);
     if (!forumData) return res.status(404).send("Forum not found");
 
-    // Count total threads (for pagination)
-    const totalThreads = await Thread.count({
-      where: { forum_id: forumId },
-    });
-
-    const totalPages = Math.ceil(totalThreads / limit);
-
-    // Fetch paginated threads
     const threads = await Thread.findAll({
       where: { forum_id: forumId },
       order: [["created_at", "DESC"]],
-      limit,
-      offset,
       attributes: {
         include: [
           [
-            sequelize.literal(
-              `(SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")`
-            ),
+            sequelize.literal(`
+            (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
+            `),
             "reply_count",
           ],
         ],
@@ -111,14 +90,13 @@ forum.get("/f/:id", async (req, res) => {
       title: forumData.name,
       forum: forumData,
       threads,
-      currentPage: page,
-      totalPages,
     });
   } catch (err) {
     console.error("Error loading forum:", err);
     res.status(500).send("Server error");
   }
 });
+
 /* ======================================================
    NEW THREAD PAGE
 ====================================================== */
@@ -137,7 +115,7 @@ forum.get("/f/:id/new", async (req, res) => {
 /* ======================================================
    POST NEW THREAD
 ====================================================== */
-forum.post("/f/:forumId/threads", async (req, res) => {
+forum.post("/f/:forumId/threads", createThreadLimiter, async (req, res) => {
   const forumId = Number(req.params.forumId);
 
   const title = sanitizeHtml(req.body.title, {
@@ -169,45 +147,25 @@ forum.post("/f/:forumId/threads", async (req, res) => {
 });
 
 /* ======================================================
-   API — VIEW THREAD WITH PAGINATED REPLIES
-   GET /forum/thread/:id?page=1
+   VIEW THREAD PAGE
 ====================================================== */
-
 forum.get("/thread/:id", async (req, res) => {
   const threadId = Number(req.params.id);
 
-  // Pagination params
-  const page = Number(req.query.page) || 1;
-  const limit = 10; // replies per page
-  const offset = (page - 1) * limit;
-
   try {
-    // Load thread info
     const thread = await Thread.findByPk(threadId);
     if (!thread) return res.status(404).send("Thread not found");
 
-    // Count total replies
-    const totalReplies = await Reply.count({
-      where: { thread_id: threadId },
-    });
-
-    const totalPages = Math.ceil(totalReplies / limit);
-
-    // Fetch paginated replies
     const replies = await Reply.findAll({
       where: { thread_id: threadId },
       order: [["created_at", "ASC"]],
-      limit,
-      offset,
     });
 
     res.render("thread", {
       title: thread.title,
-      forumId: thread.forum_id,
       thread,
       replies,
-      currentPage: page,
-      totalPages,
+      forumId: thread.forum_id,
     });
   } catch (err) {
     console.error("Error loading thread:", err);
@@ -218,7 +176,7 @@ forum.get("/thread/:id", async (req, res) => {
 /* ======================================================
    POST A REPLY
 ====================================================== */
-forum.post("/thread/:id/replies", async (req, res) => {
+forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
   const threadId = Number(req.params.id);
 
   const author = sanitizeHtml(req.body.author, {

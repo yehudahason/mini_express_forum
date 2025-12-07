@@ -37,7 +37,7 @@
       </li>
       <% }) %>
     </ul>
-    <% } %>
+    <%- include("partials/pagination", { currentPage, totalPages }) %> <% } %>
   </section>
 
   <section class="new-reply">

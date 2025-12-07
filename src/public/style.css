@@ -439,6 +439,49 @@ section.replies {
   color: #d1d5db;
 }
 
+/* ===== Pagination ===== */
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  direction: rtl; /* keep Hebrew direction */
+}
+
+.page-btn {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #f9fafb;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45),
+    0 0 0 1px rgba(191, 219, 254, 0.15);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
+    filter 0.12s ease-out;
+}
+
+.page-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.6),
+    0 0 0 1px rgba(191, 219, 254, 0.25);
+}
+
+.page-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.8);
+}
+
+.page-info {
+  font-size: 0.85rem;
+  color: #e5e7eb;
+  opacity: 0.9;
+}
+
 /* ===== Small Screens ===== */
 @media (max-width: 678px) {
   html,
