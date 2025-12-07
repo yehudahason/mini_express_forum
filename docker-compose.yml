@@ -14,8 +14,8 @@ services:
 
       PGHOST: db
       PGUSER: user
-      PGPASSWORD: password
-      PGDATABASE: mini_forum
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
       PGPORT: 5432
 
     depends_on:
@@ -31,12 +31,12 @@ services:
     restart: always
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: mini_forum
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data2:/var/lib/postgresql
+      - postgres_data3:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4:9.10
@@ -53,5 +53,5 @@ services:
       - pgadmin_data3:/var/lib/pgadmin
 
 volumes:
-  postgres_data2:
+  postgres_data3:
   pgadmin_data3:
