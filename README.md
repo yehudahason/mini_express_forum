@@ -5,4 +5,4 @@
 - npm install
 - npm run dev
 
-open http://localhost:3333/
+open http://localhost:3333/forum/
