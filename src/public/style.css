@@ -82,6 +82,11 @@ h4 {
   color: bisque;
 }
 
+pre {
+  font-family: Arial, Helvetica, sans-serif;
+  /* font-weight: bold; */
+  font-size: 1.1rem;
+}
 img.logo {
   width: 1.3rem;
 }
@@ -154,12 +159,8 @@ section.threads {
 .thread-list a {
   color: #f9fafb;
   text-decoration: none;
-  font-weight: 600;
+  /* font-weight: 600; */
   font-size: 0.98rem;
-}
-
-.thread-list a:hover {
-  text-decoration: underline;
 }
 
 .thread-list .meta {
@@ -404,6 +405,9 @@ article.thread .meta {
   text-align: right;
 }
 
+a.thread-title {
+  text-decoration: none;
+}
 /* ===== Replies ===== */
 section.replies {
   margin-bottom: 1.5rem;

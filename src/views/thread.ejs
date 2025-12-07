@@ -1,11 +1,11 @@
 <main>
   <a href="/forum" class="back-link">עמוד ראשי ← </a>
   <a href="/forum/f/<%= forumId %>" class="back-link"> &nbsp; חזרה לפורום ←</a>
-  <h1><%= forumId %></h1>
+  <h1><%= thread.title %></h1>
   <article class="thread">
-    <h2><%= thread.title %></h2>
+    <!-- <h2><%= thread.title %></h2> -->
     <br />
-    <div class="thread-content"><%= thread.content %></div>
+    <div class="thread-content"><%- thread.content %></div>
     <div class="meta">
       נכתב על ידי &nbsp;<strong><%= thread.author || "אנונימי" %></strong>
       <!-- · <%= new Date(thread.created_at).toLocaleString() %> -->
@@ -23,9 +23,9 @@
       <% replies.forEach(r => { %>
       <li class="reply">
         <strong><%= r.author || "אנונימי" %></strong>
-        <div><%= r.content %></div>
+        <div><%- r.content %></div>
         <%= formatDate(thread.created_at) %>
-        <form
+        <!-- <form
           action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
           method="POST"
           style="margin-top: 0.4rem"
@@ -33,7 +33,7 @@
           <button class="delete-btn" onclick="return confirm('למחוק תגובה?');">
             מחיקה
           </button>
-        </form>
+        </form> -->
       </li>
       <% }) %>
     </ul>
@@ -49,8 +49,8 @@
       <button type="submit">שלח תגובה</button>
     </form>
 
-    <form action="/forum/thread/<%= thread.id %>/delete" method="POST">
+    <!-- <form action="/forum/thread/<%= thread.id %>/delete" method="POST">
       <button class="delete-thread-btn">מחיקת נושא</button>
-    </form>
+    </form> -->
   </section>
 </main>

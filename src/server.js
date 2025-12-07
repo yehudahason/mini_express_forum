@@ -7,11 +7,13 @@ import expressLayouts from "express-ejs-layouts";
 import { sequelize } from "./models/index.js";
 import { Forum, Thread, Reply } from "./models/associations.js";
 import { globalLimiter, createThreadLimiter } from "./utils/ratelimit.js";
+import sanitizeHtml from "sanitize-html";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1);
 
 /* ==== DATE FORMAT LOCAL HELPER ==== */
 app.locals.formatDate = (date) => {
@@ -115,8 +117,20 @@ forum.get("/f/:id/new", async (req, res) => {
 ====================================================== */
 forum.post("/f/:forumId/threads", createThreadLimiter, async (req, res) => {
   const forumId = Number(req.params.forumId);
-  const { title, author, content } = req.body;
 
+  const title = sanitizeHtml(req.body.title, {
+    allowedTags: [], // title shouldn't have HTML
+  });
+
+  const author = sanitizeHtml(req.body.author, {
+    allowedTags: [],
+  });
+
+  let content = sanitizeHtml(req.body.content, {
+    allowedTags: ["pre", "code", "b", "i", "strong", "em", "p", "br"],
+    allowedAttributes: {},
+  });
+  content = "<pre>" + content + "</pre>";
   try {
     const thread = await Thread.create({
       forum_id: forumId,
@@ -164,8 +178,16 @@ forum.get("/thread/:id", async (req, res) => {
 ====================================================== */
 forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
   const threadId = Number(req.params.id);
-  const { author, content } = req.body;
 
+  const author = sanitizeHtml(req.body.author, {
+    allowedTags: [],
+  });
+
+  let content = sanitizeHtml(req.body.content, {
+    allowedTags: ["pre", "code", "b", "i", "strong", "em", "p", "br"],
+    allowedAttributes: {},
+  });
+  content = "<pre>" + content + "</pre>";
   try {
     await Reply.create({
       thread_id: threadId,
@@ -183,45 +205,45 @@ forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
 /* ======================================================
    DELETE THREAD
 ====================================================== */
-forum.post("/thread/:id/delete", async (req, res) => {
-  const threadId = Number(req.params.id);
+// forum.post("/thread/:id/delete", async (req, res) => {
+//   const threadId = Number(req.params.id);
 
-  try {
-    const thread = await Thread.findByPk(threadId);
-    if (!thread) return res.status(404).send("Thread not found");
+//   try {
+//     const thread = await Thread.findByPk(threadId);
+//     if (!thread) return res.status(404).send("Thread not found");
 
-    const forumId = thread.forum_id;
+//     const forumId = thread.forum_id;
 
-    await Reply.destroy({ where: { thread_id: threadId } });
-    await Thread.destroy({ where: { id: threadId } });
+//     await Reply.destroy({ where: { thread_id: threadId } });
+//     await Thread.destroy({ where: { id: threadId } });
 
-    res.redirect(`/forum/f/${forumId}`);
-  } catch (err) {
-    console.error("Error deleting thread:", err);
-    res.status(500).send("Server error");
-  }
-});
+//     res.redirect(`/forum/f/${forumId}`);
+//   } catch (err) {
+//     console.error("Error deleting thread:", err);
+//     res.status(500).send("Server error");
+//   }
+// });
 
-/* ======================================================
-   DELETE REPLY
-====================================================== */
-forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
-  const { threadId, replyId } = req.params;
+// /* ======================================================
+//    DELETE REPLY
+// ====================================================== */
+// forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
+//   const { threadId, replyId } = req.params;
 
-  try {
-    await Reply.destroy({
-      where: {
-        id: replyId,
-        thread_id: threadId,
-      },
-    });
+//   try {
+//     await Reply.destroy({
+//       where: {
+//         id: replyId,
+//         thread_id: threadId,
+//       },
+//     });
 
-    res.redirect(`/forum/thread/${threadId}`);
-  } catch (err) {
-    console.error("Error deleting reply:", err);
-    res.status(500).send("Server error");
-  }
-});
+//     res.redirect(`/forum/thread/${threadId}`);
+//   } catch (err) {
+//     console.error("Error deleting reply:", err);
+//     res.status(500).send("Server error");
+//   }
+// });
 
 /* ======================================================
    FETCH NEW POSTS ACROSS ALL FORUMS

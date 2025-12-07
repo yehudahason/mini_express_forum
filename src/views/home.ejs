@@ -11,14 +11,16 @@
   <% } else { %>
   <ul class="thread-list">
     <% forums.forEach(f => { %>
-    <li>
-      <a class="thread-title" href="/forum/f/<%= f.id %>"> <%= f.name %> </a>
+    <li class="forum-card">
+      <a class="forum-link" href="/forum/f/<%= f.id %>">
+        <h3 class="forum-name"><%= f.name %></h3>
 
-      <% if (f.description) { %>
-      <div class="meta"><%= f.description %></div>
-      <% } %>
+        <% if (f.description) { %>
+        <p class="forum-desc"><%= f.description %></p>
+        <% } %>
 
-      <a class="thread-title" href="/forum/f/<%= f.id %>"> כניסה לפורום → </a>
+        <span class="forum-enter"> →</span>
+      </a>
     </li>
     <% }) %>
   </ul>
