@@ -385,6 +385,7 @@ forum.get("/new-posts", async (req, res) => {
       // IMPORTANT: Sort by alias WITHOUT sequelize.literal()
       order: [["latest_activity", "DESC"]],
       // raw: true,
+      limit: 40, // ← LIMIT TO LAST 40 THREADS
     });
 
     res.render("new-posts", {
