@@ -15,7 +15,8 @@
 
         | מאת <b><%= p.author || "אנונימי" %></b>
 
-        | <%= formatDate(p.created_at) %> | תגובות: <%= p.reply_count %>
+        | <%= formatDate(p.dataValues.last_reply_at || p.created_at) %> |
+        תגובות: <%= p.reply_count %>
       </div>
     </li>
     <% }) %>

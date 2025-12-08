@@ -82,10 +82,27 @@ h4 {
   color: bisque;
 }
 
+.thread-content pre,
+.reply pre,
+.reply-list pre,
+pre.responsive,
+pre {
+  white-space: pre-wrap; /* Keep formatting but allow wrapping */
+  word-wrap: break-word; /* Break long words */
+  overflow-x: auto;
+  line-height: 1.45;
+  direction: rtl; /* Make sure RTL works */
+  text-align: right;
+  max-width: 100%;
+  padding: 0.4rem;
+}
 pre {
   font-family: Arial, Helvetica, sans-serif;
   /* font-weight: bold; */
   font-size: 1.1rem;
+  /* white-space: pre-wrap; Wrap long lines */
+  /* word-wrap: break-word; */
+  /* overflow-x: auto; */
 }
 img.logo {
   width: 1.3rem;
@@ -419,6 +436,7 @@ article.thread .meta {
   line-height: 1.6;
   color: #e5e7eb;
   text-align: right;
+  overflow-x: auto;
 }
 
 a.thread-title {
@@ -442,6 +460,7 @@ section.replies {
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(148, 163, 184, 0.5);
+  overflow-x: auto;
 }
 
 .reply strong {
@@ -579,7 +598,7 @@ section.replies {
 @media (max-width: 678px) {
   html,
   body {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   header {
@@ -596,6 +615,9 @@ section.replies {
 
   article.thread {
     padding-inline: 0.85rem;
+  }
+  .search-form {
+    flex-direction: column;
   }
 }
 
