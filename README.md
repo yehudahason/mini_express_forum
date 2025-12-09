@@ -1,8 +1,23 @@
-### Mini Forum with Express and POSTGRES
+### Mini Forum with Express js POSTGRES DB and pgAdmin Panel
 
-- Setup Postgres database
-- Set .env config file like env.example
-- npm install
-- npm run dev
+- Create .env file like env.example with your own credentials
+- Bulid docker containers
 
-open http://localhost:3333/forum/
+```
+ docker compose up -d
+```
+
+- Wait a minute for containers to get up
+- Open http://localhost:3333/forum/
+
+- After every node js addition of packages run
+
+```
+ docker compose down
+ docker compose build --no-cache
+ docker compose up -d
+```
+
+- For pgAdmin dashboard open http://localhost:2020/
+
+- In DB forum table add rows for your own forums

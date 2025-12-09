@@ -8,6 +8,7 @@ import { sequelize } from "./models/index.js";
 import { globalLimiter } from "./utils/ratelimit.js";
 import { logRequests } from "./utils/logMiddleware.js";
 import forum from "./routes/forumroutes.js";
+import syncDB from "./sync.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,6 +84,7 @@ const PORT = process.env.PORT || 3333;
 
 (async () => {
   try {
+    syncDB();
     await sequelize.authenticate();
     console.log("Connected to PostgreSQL via Sequelize!");
 
