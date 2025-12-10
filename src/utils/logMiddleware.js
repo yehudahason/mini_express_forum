@@ -39,7 +39,7 @@ export async function logRequests(req, res, next) {
   const logLine = `${date} | IP: ${ip} | Origin: ${origin} | Host: ${host} | ${req.method} ${req.originalUrl}\n`;
 
   // 1. Print to console
-  console.log(logLine);
+  // console.log(logLine);
 
   // 2. Append to local file (create folder logs/ if missing)
   const logPath = path.join(process.cwd(), "logs", "requests.log");
