@@ -7,7 +7,13 @@
  docker compose up -d
 ```
 
-- Wait a minute for containers to get up
+- At first you have to Wait a minute or so for containers to get up
+- Check out logs to see if database up and connected
+
+```
+docker logs forum_app
+```
+
 - Open http://localhost:3333/forum/
 
 - After every node js addition of packages run
