@@ -26,19 +26,9 @@ body {
   text-align: right;
 }
 
-/* ===== Global links ===== */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-a:hover {
-  /* text-decoration: underline; */
-  cursor: pointer;
-}
-
 /* ===== Layout ===== */
 header {
+  /* position: sticky; */
   top: 0;
   z-index: 10;
   background: rgba(15, 23, 42, 0.9);
@@ -47,14 +37,8 @@ header {
   padding: 0.9rem 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: center; /* default fallback */
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-/* Auth-aware header (layout.ejs update) */
-.main-header {
   justify-content: center;
-  gap: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 header h1 {
@@ -62,54 +46,13 @@ header h1 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin: 0;
-  text-align: center;
 }
 
-header h1 a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-/* Auth nav */
-.auth-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-right: 2rem;
-}
-
-.auth-nav a {
-  color: #e5e7eb;
-  opacity: 0.92;
-  transition: opacity 0.15s ease, color 0.15s ease;
-}
-
-.auth-nav a:hover {
-  opacity: 1;
-  color: #bfdbfe;
+header a {
+  color: inherit;
   text-decoration: none;
 }
 
-/* Logout button styled like a link */
-.link-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: #e5e7eb;
-  cursor: pointer;
-  opacity: 0.92;
-  transition: opacity 0.15s ease, color 0.15s ease;
-}
-
-.link-btn:hover {
-  opacity: 1;
-  color: #bfdbfe;
-}
-
-/* ===== Main container ===== */
 main {
   max-width: 960px;
   margin: 1.5rem auto 2.5rem auto;
@@ -134,39 +77,38 @@ h3 {
 h1 {
   text-align: center;
 }
-
 h4 {
   text-align: center;
   color: bisque;
 }
 
-p {
-  margin: 0;
-}
-
-/* Code blocks */
 .thread-content pre,
 .reply pre,
 .reply-list pre,
 pre.responsive,
 pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  white-space: pre-wrap; /* Keep formatting but allow wrapping */
+  word-wrap: break-word; /* Break long words */
   overflow-x: auto;
   line-height: 1.45;
-  direction: rtl;
+  direction: rtl; /* Make sure RTL works */
   text-align: right;
   max-width: 100%;
   padding: 0.4rem;
 }
-
 pre {
   font-family: Arial, Helvetica, sans-serif;
+  /* font-weight: bold; */
   font-size: 1.1rem;
+  /* white-space: pre-wrap; Wrap long lines */
+  /* word-wrap: break-word; */
+  /* overflow-x: auto; */
 }
-
 img.logo {
   width: 1.3rem;
+}
+p {
+  margin: 0;
 }
 
 /* ===== Page Titles ===== */
@@ -180,6 +122,7 @@ img.logo {
 /* ===== Back Button ===== */
 .back-link {
   color: #93c5fd;
+  text-decoration: none;
   font-size: 0.9rem;
   display: inline-block;
   margin-bottom: 1rem;
@@ -188,7 +131,6 @@ img.logo {
 
 .back-link:hover {
   color: #bfdbfe;
-  text-decoration: none;
 }
 
 /* ===== Empty state ===== */
@@ -223,18 +165,17 @@ section.threads {
 }
 
 .thread-list li:hover {
+  /* transform: translateY(-1px); */
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.6);
   border-color: #60a5fa;
+  /* background: rgba(30, 64, 175, 0.2); */
 }
 
 .thread-list a {
   color: #f9fafb;
-  font-size: 0.98rem;
-}
-
-.thread-list a:hover {
-  color: #bfdbfe;
   text-decoration: none;
+  /* font-weight: 600; */
+  font-size: 0.98rem;
 }
 
 .thread-list .meta {
@@ -260,10 +201,7 @@ form {
   gap: 0.8rem;
 }
 
-/* unified inputs for login/signup + existing forms */
 form input[type="text"],
-form input[type="email"],
-form input[type="password"],
 form textarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
@@ -277,14 +215,7 @@ form textarea {
   text-align: right;
 }
 
-form input[type="email"],
-form input[type="password"] {
-  direction: ltr; /* better UX for email/password */
-}
-
 form input[type="text"]::placeholder,
-form input[type="email"]::placeholder,
-form input[type="password"]::placeholder,
 form textarea::placeholder {
   color: #6b7280;
 }
@@ -295,8 +226,6 @@ form textarea {
 }
 
 form input[type="text"]:focus,
-form input[type="email"]:focus,
-form input[type="password"]:focus,
 form textarea:focus {
   outline: none;
   border-color: #60a5fa;
@@ -383,7 +312,6 @@ button.delete-thread-btn {
 
 .new-thread-btn:hover {
   background: #1e40af;
-  text-decoration: none;
 }
 
 .new-thread-btn:active {
@@ -397,7 +325,6 @@ button.delete-thread-btn {
   min-height: auto;
   padding: 0.7rem 0;
 }
-
 /* ===== Latest Posts Button ===== */
 .btn-latest {
   display: inline-block;
@@ -413,7 +340,6 @@ button.delete-thread-btn {
 
 .btn-latest:hover {
   background: #4338ca;
-  text-decoration: none;
 }
 
 .btn-search {
@@ -424,17 +350,10 @@ button.delete-thread-btn {
   align-items: center;
   text-decoration: none;
 }
-
-.btn-search:hover {
-  color: #fff;
-  text-decoration: none;
-}
-
 .btn-search img {
   width: 1.8rem;
 }
-
-/* ===== Latest Posts List ===== */
+/* ===== Improved Latest Posts (FINAL) ===== */
 .latest-posts {
   list-style: none;
   padding: 0;
@@ -455,6 +374,7 @@ button.delete-thread-btn {
 .post-item:hover {
   border-color: #60a5fa;
   background: radial-gradient(circle at top left, #1d4ed8 0%, #020617 80%);
+  /* transform: translateY(-3px); */
   box-shadow: 0 16px 40px rgba(30, 58, 138, 0.6);
 }
 
@@ -469,7 +389,6 @@ button.delete-thread-btn {
 
 .post-title:hover {
   color: #93c5fd;
-  text-decoration: none;
 }
 
 .post-item .meta {
@@ -523,7 +442,6 @@ article.thread .meta {
 a.thread-title {
   text-decoration: none;
 }
-
 /* ===== Replies ===== */
 section.replies {
   margin-bottom: 1.5rem;
@@ -563,7 +481,7 @@ section.replies {
   justify-content: center;
   align-items: center;
   gap: 0.75rem;
-  direction: rtl;
+  direction: rtl; /* keep Hebrew direction */
 }
 
 .page-btn {
@@ -586,7 +504,6 @@ section.replies {
   filter: brightness(1.05);
   box-shadow: 0 14px 30px rgba(37, 99, 235, 0.6),
     0 0 0 1px rgba(191, 219, 254, 0.25);
-  text-decoration: none;
 }
 
 .page-btn:active {
@@ -641,7 +558,6 @@ section.replies {
 .search-item a {
   color: white;
 }
-
 .reply-matches ul {
   list-style: none;
   padding: 0;
@@ -661,7 +577,6 @@ section.replies {
   opacity: 0.7;
 }
 
-/* ===== Login/Signup bottom links ===== */
 .redirect-links {
   display: flex;
   justify-content: center;
@@ -670,18 +585,15 @@ section.replies {
   flex-wrap: wrap;
   gap: 4rem;
 }
-
 .redirect-links a {
+  text-decoration: none;
   cursor: pointer;
   color: white;
-  text-decoration: none;
 }
-
 .redirect-links a:hover {
   text-decoration: underline;
   color: bisque;
 }
-
 /* ===== Small Screens ===== */
 @media (max-width: 678px) {
   html,
@@ -696,6 +608,32 @@ section.replies {
   main {
     padding: 1rem 0.9rem;
   }
+  .main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .auth-nav {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .auth-nav a,
+  .link-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: none;
+  }
+
+  .auth-nav a.active {
+    text-decoration: underline;
+  }
 
   .thread-list li {
     padding-inline: 0.75rem;
@@ -704,7 +642,6 @@ section.replies {
   article.thread {
     padding-inline: 0.85rem;
   }
-
   .search-form {
     flex-direction: column;
   }

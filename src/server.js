@@ -5,13 +5,19 @@ import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
 import { sequelize } from "./models/index.js";
-import { globalLimiter } from "./utils/ratelimit.js";
 import { logRequests } from "./utils/logMiddleware.js";
 import forum from "./routes/forumroutes.js";
 import syncDB from "./sync.js";
-
+import { createClient } from "@supabase/supabase-js";
+import router from "./routes/authroutes.js";
+import cookieParser from "cookie-parser";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 const app = express();
 
@@ -39,7 +45,7 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(cookieParser());
 app.set("trust proxy", 1);
 
 app.locals.formatDate = function (date) {
@@ -73,9 +79,23 @@ app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
 app.set("layout", "layout");
 
+app.use(async (req, res, next) => {
+  const accessToken = req.cookies?.sb_access_token;
+
+  if (!accessToken) {
+    res.locals.user = null;
+    return next();
+  }
+
+  const { data } = await supabase.auth.getUser(accessToken);
+  res.locals.user = data?.user || null;
+  next();
+});
+
 /* ======================================================
    MOUNT ROUTER
 ====================================================== */
+app.use("/", router);
 app.use("/", forum);
 
 /* ======================================================

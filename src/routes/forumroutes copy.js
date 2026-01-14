@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { sequelize } from "../models/index.js";
 import { Forum, Thread, Reply } from "../models/associations.js";
+import { createThreadLimiter, searchLimiter } from "../utils/ratelimit.js";
 import sanitizeHtml from "sanitize-html";
 import { Op } from "sequelize";
 
@@ -38,10 +39,9 @@ forum.get("/", async (req, res) => {
 
 forum.get("/f/:id", async (req, res) => {
   const forumId = Number(req.params.id);
-  if (Number.isNaN(forumId)) return res.status(400).send("Invalid forum id");
 
   // Pagination params
-  const page = Math.max(Number(req.query.page) || 1, 1);
+  const page = Number(req.query.page) || 1;
   const limit = 10; // threads per page
   const offset = (page - 1) * limit;
 
@@ -55,38 +55,24 @@ forum.get("/f/:id", async (req, res) => {
       where: { forum_id: forumId },
     });
 
-    const totalPages = Math.max(Math.ceil(totalThreads / limit), 1);
+    const totalPages = Math.ceil(totalThreads / limit);
 
-    // Clamp too-high page
-    if (page > totalPages) {
-      return res.redirect(`/f/${forumId}?page=${totalPages}`);
-    }
-
-    // Fetch paginated threads + reply_count (NO literal)
+    // Fetch paginated threads
     const threads = await Thread.findAll({
       where: { forum_id: forumId },
-
-      attributes: {
-        include: [
-          [sequelize.fn("COUNT", sequelize.col("Replies.id")), "reply_count"],
-        ],
-      },
-
-      include: [
-        {
-          model: Reply,
-          attributes: [],
-          required: false, // LEFT JOIN (threads with 0 replies still show)
-        },
-      ],
-
-      group: ["Thread.id"],
       order: [["created_at", "DESC"]],
       limit,
       offset,
-
-      // Important when using limit/offset with include + group
-      subQuery: false,
+      attributes: {
+        include: [
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")`
+            ),
+            "reply_count",
+          ],
+        ],
+      },
     });
 
     res.render("forum", {
@@ -119,7 +105,7 @@ forum.get("/f/:id/new", async (req, res) => {
 /* ======================================================
    POST NEW THREAD
 ====================================================== */
-forum.post("/f/:forumId/threads", async (req, res) => {
+forum.post("/f/:forumId/threads", createThreadLimiter, async (req, res) => {
   const forumId = Number(req.params.forumId);
 
   const title = sanitizeHtml(req.body.title, {
@@ -200,7 +186,7 @@ forum.get("/thread/:id", async (req, res) => {
 // SEARCH FORUM THREAD AND REPLIES
 // /search?q=qeury
 // ###################################
-forum.get("/search", async (req, res) => {
+forum.get("/search", searchLimiter, async (req, res) => {
   const q = req.query.q?.trim();
 
   if (!q) {
@@ -283,7 +269,7 @@ forum.get("/search", async (req, res) => {
 /* ======================================================
    POST A REPLY
 ====================================================== */
-forum.post("/thread/:id/replies", async (req, res) => {
+forum.post("/thread/:id/replies", createThreadLimiter, async (req, res) => {
   const threadId = Number(req.params.id);
 
   const author = sanitizeHtml(req.body.author, {
@@ -362,46 +348,44 @@ forum.post("/thread/:threadId/replies/:replyId/delete", async (req, res) => {
 forum.get("/new-posts", async (req, res) => {
   try {
     const posts = await Thread.findAll({
-      attributes: {
-        include: [
-          // COUNT(replies)
-          [sequelize.fn("COUNT", sequelize.col("Replies.id")), "reply_count"],
-
-          // MAX(reply.created_at)
-          [
-            sequelize.fn("MAX", sequelize.col("Replies.created_at")),
-            "last_reply_at",
-          ],
-
-          // COALESCE(MAX(reply.created_at), Thread.created_at)
-          [
-            sequelize.fn(
-              "COALESCE",
-              sequelize.fn("MAX", sequelize.col("Replies.created_at")),
-              sequelize.col("Thread.created_at")
-            ),
-            "latest_activity",
-          ],
-        ],
-      },
-
       include: [
         {
           model: Forum,
           attributes: ["id", "name"],
         },
-        {
-          model: Reply,
-          attributes: [],
-          required: false, // LEFT JOIN (threads with 0 replies)
-        },
       ],
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`
+              (SELECT COUNT(*) FROM replies r WHERE r.thread_id = "Thread"."id")
+            `),
+            "reply_count",
+          ],
 
-      group: ["Thread.id", "Forum.id"],
+          [
+            sequelize.literal(`
+              COALESCE(
+                (SELECT MAX(r.created_at) FROM replies r WHERE r.thread_id = "Thread"."id"),
+                "Thread"."created_at"
+              )
+            `),
+            "latest_activity",
+          ],
 
-      order: [[sequelize.col("latest_activity"), "DESC"]],
-      limit: 40,
-      subQuery: false,
+          [
+            sequelize.literal(`
+              (SELECT MAX(r.created_at) FROM replies r WHERE r.thread_id = "Thread"."id")
+            `),
+            "last_reply_at",
+          ],
+        ],
+      },
+
+      // IMPORTANT: Sort by alias WITHOUT sequelize.literal()
+      order: [["latest_activity", "DESC"]],
+      // raw: true,
+      limit: 40, // ← LIMIT TO LAST 40 THREADS
     });
 
     res.render("new-posts", {

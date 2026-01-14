@@ -28,8 +28,19 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <header>
-      <h1><a href="/">Pitron halomot </a></h1>
+    <header class="main-header">
+      <h1><a href="/">Pitron halomot</a></h1>
+
+      <nav class="auth-nav">
+        <% if (user) { %>
+        <form method="POST" action="/auth/logout">
+          <button type="submit" class="link-btn">התנתקות</button>
+        </form>
+        <% } else { %>
+        <a href="/auth/login">התחברות</a>
+        <a href="/auth/signup">הרשמה</a>
+        <% } %>
+      </nav>
     </header>
 
     <%- body %>
