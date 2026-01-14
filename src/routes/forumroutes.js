@@ -398,4 +398,10 @@ forum.get("/new-posts", async (req, res) => {
   }
 });
 
+forum.use((req, res) => {
+  res.status(404).render("notFound", {
+    title: "404 Not Found",
+  });
+});
+
 export default forum;
