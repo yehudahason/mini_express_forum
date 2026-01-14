@@ -12,7 +12,7 @@ export const createThreadLimiter = rateLimit({
   max: 1,
   message: `<h3 style="text-align: center; margin: 1rem auto">המתן 10 שניות בין תגובות</h3>
 <div style="display: flex; justify-content: center">
-  <a href="/forum">Back to Forum</a>
+  <a href="/">Back to Forum</a>
 </div>`,
 });
 

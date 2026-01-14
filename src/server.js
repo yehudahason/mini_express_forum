@@ -20,6 +20,7 @@ const allowedOrigins = [
   "http://localhost:3333",
   "https://pitron-halomot.org",
   "https://www.pitron-halomot.org",
+  "https://forum.pitron-halomot.org",
 ];
 
 app.use(logRequests);
@@ -58,7 +59,7 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
-  "/forum",
+  "/",
   express.static(path.join(__dirname, "public"), {
     maxAge: 0,
     etag: false,
@@ -66,7 +67,7 @@ app.use(
   })
 );
 
-app.use(globalLimiter);
+// app.use(globalLimiter);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
@@ -75,7 +76,7 @@ app.set("layout", "layout");
 /* ======================================================
    MOUNT ROUTER
 ====================================================== */
-app.use("/forum", forum);
+app.use("/", forum);
 
 /* ======================================================
    START SERVER

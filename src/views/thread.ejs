@@ -1,6 +1,6 @@
 <main>
-  <a href="/forum" class="back-link">עמוד ראשי ← </a>
-  <a href="/forum/f/<%= forumId %>" class="back-link"> &nbsp; חזרה לפורום ←</a>
+  <a href="/" class="back-link">עמוד ראשי ← </a>
+  <a href="/f/<%= forumId %>" class="back-link"> &nbsp; חזרה לפורום ←</a>
   <h1><%= thread.title %></h1>
   <article class="thread">
     <!-- <h2><%= thread.title %></h2> -->
@@ -25,15 +25,15 @@
         <strong><%= r.author || "אנונימי" %></strong>
         <div><%- r.content %></div>
         <%= formatDate(r.created_at) %>
-        <!-- <form
-          action="/forum/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
+        <form
+          action="/thread/<%= thread.id %>/replies/<%= r.id %>/delete"
           method="POST"
           style="margin-top: 0.4rem"
         >
           <button class="delete-btn" onclick="return confirm('למחוק תגובה?');">
             מחיקה
           </button>
-        </form> -->
+        </form>
       </li>
       <% }) %>
     </ul>
@@ -43,14 +43,14 @@
   <section class="new-reply">
     <h3>הוסף תגובה</h3>
 
-    <form method="POST" action="/forum/thread/<%= thread.id %>/replies">
+    <form method="POST" action="/thread/<%= thread.id %>/replies">
       <input type="text" name="author" placeholder="שם" />
       <textarea name="content" placeholder="כתוב תגובה..." required></textarea>
       <button type="submit">שלח תגובה</button>
     </form>
 
-    <!-- <form action="/forum/thread/<%= thread.id %>/delete" method="POST">
+    <form action="/thread/<%= thread.id %>/delete" method="POST">
       <button class="delete-thread-btn">מחיקת נושא</button>
-    </form> -->
+    </form>
   </section>
 </main>

@@ -1,12 +1,12 @@
 <main>
-  <a href="/forum" class="back-link">עמוד ראשי ← </a>
+  <a href="/" class="back-link">עמוד ראשי ← </a>
 
   <h1 class="page-title"><%= forum.name %></h1>
 
   <% if (forum.description) { %>
   <p class="meta"><%= forum.description %></p>
   <% } %>
-  <a href="/forum/f/<%= forum.id %>/new" class="new-thread-btn">
+  <a href="/f/<%= forum.id %>/new" class="new-thread-btn">
     ✏️ פתיחת נושא חדש
   </a>
 
@@ -22,9 +22,7 @@
     <ul class="thread-list">
       <% threads.forEach(t => { %>
       <li>
-        <a class="thread-title" href="/forum/thread/<%= t.id %>">
-          <%= t.title %>
-        </a>
+        <a class="thread-title" href="/thread/<%= t.id %>"> <%= t.title %> </a>
 
         <div class="meta">
           מאת <%= t.author || "אנונימי" %> · <%= formatDate(t.created_at) %> ·

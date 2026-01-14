@@ -1,8 +1,8 @@
 <main>
   <section class="new-thread">
     <h2>פתיחת נושא חדש</h2>
-    <a href="/forum" class="back-link">← דף הבית</a>
-    <form action="/forum/f/<%= forum.id %>/threads" method="POST">
+    <a href="/" class="back-link">← דף הבית</a>
+    <form action="/f/<%= forum.id %>/threads" method="POST">
       <input type="text" name="title" placeholder="כותרת" required />
 
       <input type="text" name="author" placeholder="שם (לא חובה)" />

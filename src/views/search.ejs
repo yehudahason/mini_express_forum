@@ -1,12 +1,12 @@
 <main>
-  <a href="/forum" class="back-link">עמוד ראשי ←</a>
+  <a href="/" class="back-link">עמוד ראשי ←</a>
 
   <h1 class="page-title">חיפוש בפורום</h1>
 
   <!-- ============================
        SEARCH FORM
   ============================= -->
-  <form action="/forum/search" method="GET" class="search-form">
+  <form action="/search" method="GET" class="search-form">
     <input
       type="text"
       name="q"
@@ -47,7 +47,7 @@
       <p class="meta">נמצא התאמה בכותרת</p>
       <% } %>
       <!-- Thread Title -->
-      <a class="thread-title" href="/forum/thread/<%= item.thread.id %>">
+      <a class="thread-title" href="/thread/<%= item.thread.id %>">
         <%= item.thread.title || ("נושא #" + item.thread.id) %>
       </a>
 
