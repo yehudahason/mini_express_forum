@@ -1,6 +1,7 @@
 import { Forum } from "./Forum.js";
 import { Thread } from "./Thread.js";
 import { Reply } from "./Reply.js";
+import { User } from "./User.js";
 
 // Forum has many threads
 Forum.hasMany(Thread, {
@@ -24,4 +25,4 @@ Reply.belongsTo(Thread, {
   foreignKey: "thread_id",
 });
 
-export { Forum, Thread, Reply };
+export { Forum, Thread, Reply, User };

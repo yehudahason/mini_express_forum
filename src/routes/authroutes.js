@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { createClient } from "@supabase/supabase-js";
+import { insertUserNic } from "../utils/insertUserNic.js";
 
 const router = express.Router();
 
@@ -37,7 +38,14 @@ router.post("/auth/signup", async (req, res) => {
       .status(400)
       .render("signup", { title: "Signup", error: "הסיסמאות לא תואמות" });
   }
-
+  try {
+    await insertUserNic(email, username);
+  } catch (err) {
+    console.log("Error inserting user nic:", err);
+    return res
+      .status(400)
+      .render("signup", { title: "Signup", error: "שם משתמש קיים" });
+  }
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
