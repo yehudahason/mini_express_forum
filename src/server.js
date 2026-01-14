@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
-import { sequelize } from "./models/index.js";
+import { sequelize } from "./models/models.js";
 import { logRequests } from "./utils/logMiddleware.js";
 import forum from "./routes/forumroutes.js";
 // import syncDB from "./sync.js";
