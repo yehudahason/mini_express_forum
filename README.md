@@ -14,7 +14,7 @@
 docker logs forum_app
 ```
 
-- Open http://localhost:3333/forum/
+- Open http://localhost:3333/
 
 - After every node js addition of packages run
 
