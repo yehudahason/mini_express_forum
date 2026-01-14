@@ -25,11 +25,13 @@ router.get("/auth/signup", (req, res) => {
 router.post("/auth/signup", async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
-  if (!email || !password) {
-    return res
-      .status(400)
-      .render("signup", { title: "Signup", error: "חסר אימייל או סיסמה" });
+  if (!email || !password || !username) {
+    return res.status(400).render("signup", {
+      title: "Signup",
+      error: "חסר אימייל או סיסמה או שם משתמש",
+    });
   }
+
   if (password !== confirmPassword) {
     return res
       .status(400)
@@ -45,6 +47,7 @@ router.post("/auth/signup", async (req, res) => {
   });
 
   if (error) {
+    console.log(error);
     return res
       .status(400)
       .render("signup", { title: "Signup", error: error.message });

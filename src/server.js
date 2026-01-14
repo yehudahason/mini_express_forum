@@ -79,6 +79,35 @@ app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
 app.set("layout", "layout");
 
+app.post("/set-username", async (req, res) => {
+  const { username } = req.body;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return res.sendStatus(401);
+
+  const { error } = await supabase.from("profiles").insert({
+    id: user.id,
+    username,
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ error: "Username already taken" });
+    }
+    return res.status(400).json({ error: error.message });
+  }
+
+  // optional mirror into metadata
+  await supabase.auth.updateUser({
+    data: { username },
+  });
+
+  res.json({ username });
+});
+
 app.use(async (req, res, next) => {
   const accessToken = req.cookies?.sb_access_token;
 

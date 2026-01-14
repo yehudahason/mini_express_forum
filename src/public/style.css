@@ -102,6 +102,7 @@ header h1 a {
   cursor: pointer;
   opacity: 0.92;
   transition: opacity 0.15s ease, color 0.15s ease;
+  padding: 4px 8px 6px;
 }
 
 .link-btn:hover {
