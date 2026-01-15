@@ -110,6 +110,22 @@ header h1 a {
   color: #bfdbfe;
 }
 
+.emoji-wrapper {
+  position: relative;
+  /* max-width: 700px; */
+}
+
+emoji-picker {
+  position: absolute;
+  z-index: 10;
+  top: 100%;
+  margin-top: 5px;
+}
+
+#emojiBtn {
+  margin: 5px 20px;
+  cursor: pointer;
+}
 /* ===== Main container ===== */
 main {
   max-width: 960px;
