@@ -8,7 +8,7 @@
 ```
 
 - At first you have to Wait a minute or so for containers to get up
-- Check out logs to see if database up and connected
+- Check out docker logs to see if database up and connected
 
 ```
 docker logs forum_app

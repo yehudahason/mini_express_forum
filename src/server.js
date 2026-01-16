@@ -7,7 +7,7 @@ import cors from "cors";
 import { sequelize } from "./models/models.js";
 import { logRequests } from "./utils/logMiddleware.js";
 import forum from "./routes/forumroutes.js";
-// import syncDB from "./sync.js";
+import syncDB from "./sync.js";
 import { createClient } from "@supabase/supabase-js";
 import router from "./routes/authroutes.js";
 import cookieParser from "cookie-parser";
@@ -134,7 +134,7 @@ const PORT = process.env.PORT || 3333;
 
 (async () => {
   try {
-    // syncDB();
+    syncDB();
     await sequelize.authenticate();
     console.log("Connected to PostgreSQL via Sequelize!");
 

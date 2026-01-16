@@ -115,7 +115,6 @@ router.post("/auth/login", async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     maxAge: 1000 * 60 * 60 * 24 * 30,
   });
-
   return res.redirect("/");
 });
 
